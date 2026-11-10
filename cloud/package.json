@@ -1,0 +1,22 @@
+{
+  "name": "since-cloud",
+  "private": true,
+  "type": "module",
+  "description": "Hosts since on Cloudflare: a Worker in front, and one Durable Object per visitor holding that visitor's memory.",
+  "scripts": {
+    "dev": "cf dev",
+    "deploy": "cf deploy",
+    "typecheck": "cf workers types && tsc"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "2.0.0-beta.v.14",
+    "cf": "1.0.0-beta.28",
+    "typescript": "7.0.2",
+    "vite": "8.3.7"
+  },
+  "allowScripts": {
+    "workerd@1.20261104.1": true,
+    "workerd@1.20261110.1": true,
+    "fsevents@2.3.3": true
+  }
+}

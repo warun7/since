@@ -1,9 +1,10 @@
 // Terminal chat: `npm run chat`. Uses the same runTurn and memory store as the web app.
 // /new starts a fresh conversation, /exit quits, Ctrl+C stops a running answer (or quits when idle).
+import 'dotenv/config';
 import { createInterface } from 'node:readline/promises';
 import { assertConfig, config } from './config.js';
 import { flushBackground, runTurn } from './agent/orchestrator.js';
-import { MemoryStore } from './memory/store.js';
+import { openStore } from './memory/db.js';
 import { formatDay } from './memory/temporal.js';
 import type { AgentEvent, SearchQuery, TurnTrace } from './types.js';
 
@@ -119,7 +120,7 @@ function truncate(s: string, n: number): string {
 
 async function main(): Promise<void> {
   assertConfig();
-  const store = MemoryStore.open();
+  const store = openStore();
   const rl = createInterface({ input: process.stdin, output: process.stdout });
 
   let conversationId: string | undefined;

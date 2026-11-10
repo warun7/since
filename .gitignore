@@ -5,3 +5,10 @@ data/
 .DS_Store
 evals/results/
 .claude/
+
+# Cloudflare hosting (cloud/)
+cloud/node_modules/
+cloud/.assets/
+cloud/.cloudflare/
+.cloudflare/
+.dev.vars*

@@ -35,7 +35,14 @@ export function contextMessage(input: { clock: Clock; memory: RecallResult; conv
     out.push('', 'Dates in the user\'s message, resolved:');
     const empty = new Set(memory.emptyRefs.map((r) => r.start + r.end));
     for (const r of memory.refs) {
-      out.push(`- "${r.text}" = ${r.label}${empty.has(r.start + r.end) ? ' — NO conversations with the user on this date' : ''}`);
+      // Say what each date holds either way: left unsaid, the model has been seen to infer "no record".
+      const n = memory.hits.filter((h) => h.askedAt >= r.start && h.askedAt < r.end).length;
+      const holds = empty.has(r.start + r.end)
+        ? ' — NO conversations with the user on this date'
+        : n
+          ? ` — ${n} past exchange${n === 1 ? '' : 's'} with the user on this date`
+          : '';
+      out.push(`- "${r.text}" = ${r.label}${holds}`);
     }
   }
 

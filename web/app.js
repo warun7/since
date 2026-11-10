@@ -173,6 +173,7 @@ async function readEvents(body, onEvent) {
 const state = {
   health: { ok: false, upheld: false, model: '', search: '' },
   conversations: [],
+  conversationsLoaded: false,
   conversationId: null, // open conversation; null means a new chat
   convSources: new Map(), // n -> SourceSummary for earlier turns of the open conversation
   activeTurn: null, // the turn currently streaming, if any
@@ -298,7 +299,9 @@ function summaryLine({ recalled, searches, sources, ms }) {
 async function refreshSidebar() {
   try {
     state.conversations = await api.conversations();
+    state.conversationsLoaded = true;
     renderSidebar();
+    paintExampleOffer();
     // The title is written after the answer, so the header catches up here.
     const active = state.conversations.find((c) => c.id === state.conversationId);
     if (active?.title) setHeader(active.title);
@@ -1017,6 +1020,53 @@ function renderEmpty() {
       el('div', { class: 'chips' }, chips),
     ),
   );
+  paintExampleOffer();
+}
+
+/**
+ * While memory is empty, offer three real past conversations (backdated to last Tuesday,
+ * last Monday and 3 November), so the memory questions can be tried straight away.
+ */
+function paintExampleOffer() {
+  const empty = dom.threadInner.querySelector('.empty');
+  if (!empty) return;
+  const current = empty.querySelector('.example-offer');
+  if (current?.dataset.done) return;
+  current?.remove();
+  if (!state.conversationsLoaded || state.conversations.length) return;
+
+  const button = el('button', { type: 'button', class: 'example-btn' }, 'Add example history');
+  const offer = el(
+    'div',
+    { class: 'example-offer' },
+    el(
+      'p',
+      { class: 'muted small' },
+      'No past conversations yet. To try questions about them, add three real ones from last Tuesday, last Monday and 3 November.',
+    ),
+    button,
+  );
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    button.textContent = 'Adding three conversations… about 15 s';
+    offer.querySelector('.turn-error')?.remove();
+    try {
+      const res = await fetch('/api/example-history', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ tz: TZ }),
+      });
+      if (!res.ok) throw new Error(await errorFrom(res));
+      offer.dataset.done = '1';
+      offer.replaceChildren(el('p', { class: 'muted small' }, 'Added. They are in the sidebar: ask about them with the first two questions above.'));
+      await refreshSidebar();
+    } catch (err) {
+      button.disabled = false;
+      button.textContent = 'Add example history';
+      offer.append(el('p', { class: 'turn-error small', role: 'alert' }, err.message));
+    }
+  });
+  empty.append(offer);
 }
 
 function setHash(id) {

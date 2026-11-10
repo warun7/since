@@ -1,12 +1,14 @@
 // Runs the eval scenarios end to end: fixture history -> live turns -> judge (+ upheld).
 // Usage: npm run eval [-- --only recall-by-date,crm-shortlist]
 // Writes evals/results/<runId>/ with one SQLite DB per scenario and report.json.
+import 'dotenv/config';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertConfig, config } from '../src/config.js';
 import { flushBackground, runTurn } from '../src/agent/orchestrator.js';
-import { MemoryStore } from '../src/memory/store.js';
+import { openStore } from '../src/memory/db.js';
+import type { MemoryStore } from '../src/memory/store.js';
 import { judge, type Criterion } from './judge.js';
 import { scenarios, type FixtureTurn, type Scenario } from './scenarios.js';
 import { upheldEnabled, verifyAnswer } from '../src/verify/upheld.js';
@@ -109,7 +111,7 @@ async function runScenario(sc: Scenario, runDir: string): Promise<ScenarioRecord
     judgePassRate: 0,
     upheld: null,
   };
-  const store = MemoryStore.open(join(runDir, `${sc.id}.db`));
+  const store = openStore(join(runDir, `${sc.id}.db`));
   let conversationId: string | undefined;
 
   try {

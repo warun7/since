@@ -1,5 +1,6 @@
 // DeepSeek through its OpenAI-compatible Chat Completions API.
-// One client for the whole process: keep-alive connections cut a TLS handshake off every call.
+// One client per process, created on first use: keep-alive connections cut a TLS handshake
+// off every call, and waiting until then lets the hosted Worker set the key first.
 import OpenAI from 'openai';
 import type { ChatCompletionChunk, ChatCompletionCreateParamsStreaming, ChatCompletionMessageParam, ChatCompletionTool } from 'openai/resources/chat/completions';
 import { config } from '../config.js';
@@ -7,12 +8,14 @@ import { config } from '../config.js';
 export type Message = ChatCompletionMessageParam;
 export type Tool = ChatCompletionTool;
 
-export const client = new OpenAI({
-  apiKey: config.deepseekApiKey || 'missing',
-  baseURL: config.deepseekBaseUrl,
-  maxRetries: 2,
-  timeout: 60_000,
-});
+let openai: OpenAI | undefined;
+const client = (): OpenAI =>
+  (openai ??= new OpenAI({
+    apiKey: config.deepseekApiKey || 'missing',
+    baseURL: config.deepseekBaseUrl,
+    maxRetries: 2,
+    timeout: 60_000,
+  }));
 
 /** DeepSeek defaults to thinking mode; the chat path disables it for time-to-first-token. */
 const NO_THINKING = { thinking: { type: 'disabled' } } as const;
@@ -58,7 +61,7 @@ export async function* streamChat(params: {
     ...NO_THINKING,
   } as ChatCompletionCreateParamsStreaming;
 
-  const stream = await client.chat.completions.create(body, { signal: params.signal });
+  const stream = await client().chat.completions.create(body, { signal: params.signal });
 
   let content = '';
   let finishReason: string | null = null;
@@ -97,7 +100,7 @@ export async function* streamChat(params: {
  * The system prompt must mention JSON (a DeepSeek requirement for json_object mode).
  */
 export async function chatJSON<T>(system: string, user: string, opts: { model?: string; maxTokens?: number; signal?: AbortSignal } = {}): Promise<T> {
-  const res = await client.chat.completions.create(
+  const res = await client().chat.completions.create(
     {
       model: opts.model ?? config.memoryModel,
       messages: [

@@ -1,7 +1,4 @@
 // Persistence for conversations, messages, sources and turn memory.
-import type Database from 'better-sqlite3';
-import crypto from 'node:crypto';
-import { openDb } from './db.js';
 import type {
   Claim,
   Conversation,
@@ -13,6 +10,7 @@ import type {
   TurnTrace,
   Verification,
 } from '../types.js';
+import type { Sql } from './sql.js';
 
 // Rows are read as the raw SQLite shapes; the mappers below turn them into the shared types.
 interface ConversationRow {
@@ -60,11 +58,7 @@ interface TurnRow {
 const FTS_ANSWER_CHARS = 1500;
 
 export class MemoryStore {
-  constructor(private readonly db: Database.Database) {}
-
-  static open(path?: string): MemoryStore {
-    return new MemoryStore(openDb(path));
-  }
+  constructor(private readonly sql: Sql) {}
 
   // ───────────────────────── Conversations ─────────────────────────
 
@@ -72,43 +66,38 @@ export class MemoryStore {
     const id = crypto.randomUUID();
     // ISO strings with a fixed UTC format sort correctly as text, which the range queries rely on.
     const iso = (at ?? new Date()).toISOString();
-    this.db
-      .prepare('INSERT INTO conversations (id, title, created_at, updated_at) VALUES (?, NULL, ?, ?)')
-      .run(id, iso, iso);
+    this.sql.run('INSERT INTO conversations (id, title, created_at, updated_at) VALUES (?, NULL, ?, ?)', id, iso, iso);
     return { id, title: null, createdAt: iso, updatedAt: iso };
   }
 
   getConversation(id: string): Conversation | null {
-    const row = this.db.prepare('SELECT * FROM conversations WHERE id = ?').get(id) as ConversationRow | undefined;
+    const row = this.sql.get<ConversationRow>('SELECT * FROM conversations WHERE id = ?', id);
     return row ? toConversation(row) : null;
   }
 
   listConversations(limit = 100): ConversationListItem[] {
-    const rows = this.db
-      .prepare(
-        `SELECT c.*, (SELECT COUNT(*) FROM turns t WHERE t.conversation_id = c.id) AS turns
-           FROM conversations c
-          WHERE EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id)
-          ORDER BY c.updated_at DESC
-          LIMIT ?`,
-      )
-      .all(limit) as Array<ConversationRow & { turns: number }>;
+    const rows = this.sql.all<ConversationRow & { turns: number }>(
+      `SELECT c.*, (SELECT COUNT(*) FROM turns t WHERE t.conversation_id = c.id) AS turns
+         FROM conversations c
+        WHERE EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id)
+        ORDER BY c.updated_at DESC
+        LIMIT ?`,
+      limit,
+    );
     return rows.map((r) => ({ ...toConversation(r), turns: r.turns }));
   }
 
   deleteConversation(id: string): void {
     // The foreign-key cascade removes the turns rows but cannot reach the FTS table, so its
     // rows are removed first, while the turns that name them still exist.
-    this.db.transaction(() => {
-      this.db
-        .prepare('DELETE FROM turns_fts WHERE message_id IN (SELECT message_id FROM turns WHERE conversation_id = ?)')
-        .run(id);
-      this.db.prepare('DELETE FROM conversations WHERE id = ?').run(id);
-    })();
+    this.sql.transaction(() => {
+      this.sql.run('DELETE FROM turns_fts WHERE message_id IN (SELECT message_id FROM turns WHERE conversation_id = ?)', id);
+      this.sql.run('DELETE FROM conversations WHERE id = ?', id);
+    });
   }
 
   setTitle(id: string, title: string): void {
-    this.db.prepare('UPDATE conversations SET title = ? WHERE id = ?').run(title, id);
+    this.sql.run('UPDATE conversations SET title = ? WHERE id = ?', title, id);
   }
 
   // ───────────────────────── Messages ─────────────────────────
@@ -124,58 +113,53 @@ export class MemoryStore {
   }): StoredMessage {
     const id = m.id ?? crypto.randomUUID();
     const createdAt = (m.createdAt ?? new Date()).toISOString();
-    this.db.transaction(() => {
-      this.db
-        .prepare(
-          `INSERT INTO messages (id, conversation_id, role, content, created_at, sources_json, trace_json)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .run(
-          id,
-          m.conversationId,
-          m.role,
-          m.content,
-          createdAt,
-          m.sources ? JSON.stringify(m.sources) : null,
-          m.trace ? JSON.stringify(m.trace) : null,
-        );
+    this.sql.transaction(() => {
+      this.sql.run(
+        `INSERT INTO messages (id, conversation_id, role, content, created_at, sources_json, trace_json)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        id,
+        m.conversationId,
+        m.role,
+        m.content,
+        createdAt,
+        m.sources ? JSON.stringify(m.sources) : null,
+        m.trace ? JSON.stringify(m.trace) : null,
+      );
       // Seeds pass backdated times, so the conversation takes the message's time rather than "now".
-      this.db.prepare('UPDATE conversations SET updated_at = ? WHERE id = ?').run(createdAt, m.conversationId);
-    })();
-    return toMessage(
-      this.db.prepare('SELECT * FROM messages WHERE id = ?').get(id) as MessageRow,
-    );
+      this.sql.run('UPDATE conversations SET updated_at = ? WHERE id = ?', createdAt, m.conversationId);
+    });
+    return toMessage(this.sql.get<MessageRow>('SELECT * FROM messages WHERE id = ?', id)!);
   }
 
   setVerification(messageId: string, v: Verification): void {
-    this.db
-      .prepare('UPDATE messages SET verification_json = ? WHERE id = ?')
-      .run(JSON.stringify(v), messageId);
+    this.sql.run('UPDATE messages SET verification_json = ? WHERE id = ?', JSON.stringify(v), messageId);
   }
 
   getMessages(conversationId: string): StoredMessage[] {
     // rowid breaks ties between messages with the same timestamp, in the order they were written.
-    const rows = this.db
-      .prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at, rowid')
-      .all(conversationId) as MessageRow[];
+    const rows = this.sql.all<MessageRow>('SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at, rowid', conversationId);
     return rows.map(toMessage);
+  }
+
+  /** How many questions the user has asked since a time. Backdated (seeded) messages don't count. */
+  questionsSince(iso: string): number {
+    return this.sql.get<{ n: number }>("SELECT COUNT(*) AS n FROM messages WHERE role = 'user' AND created_at >= ?", iso)!.n;
   }
 
   // ───────────────────────── Sources ─────────────────────────
 
   saveSources(conversationId: string, sources: Source[]): void {
-    const upsert = this.db.prepare(
-      `INSERT INTO sources (conversation_id, n, url, title, site, published, authority, passages_json)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT (conversation_id, n) DO UPDATE SET
-         url = excluded.url, title = excluded.title, site = excluded.site,
-         published = excluded.published, authority = excluded.authority,
-         passages_json = excluded.passages_json`,
-    );
-    this.db.transaction(() => {
+    const upsert = `INSERT INTO sources (conversation_id, n, url, title, site, published, authority, passages_json)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (conversation_id, n) DO UPDATE SET
+                      url = excluded.url, title = excluded.title, site = excluded.site,
+                      published = excluded.published, authority = excluded.authority,
+                      passages_json = excluded.passages_json`;
+    this.sql.transaction(() => {
       for (const s of sources) {
-        // better-sqlite3 rejects undefined as a bind value, so optional fields become NULL.
-        upsert.run(
+        // Neither SQLite driver accepts undefined as a bind value, so optional fields become NULL.
+        this.sql.run(
+          upsert,
           conversationId,
           s.n,
           s.url,
@@ -186,77 +170,71 @@ export class MemoryStore {
           JSON.stringify(s.passages ?? []),
         );
       }
-    })();
+    });
   }
 
   getSources(conversationId: string): Source[] {
-    const rows = this.db
-      .prepare('SELECT * FROM sources WHERE conversation_id = ? ORDER BY n')
-      .all(conversationId) as SourceRow[];
-    return rows.map(toSource);
+    return this.sql.all<SourceRow>('SELECT * FROM sources WHERE conversation_id = ? ORDER BY n', conversationId).map(toSource);
   }
 
   // ───────────────────────── Turn memory ─────────────────────────
 
   saveTurn(t: TurnMemory): void {
-    this.db.transaction(() => {
-      this.db
-        .prepare(
-          `INSERT INTO turns (message_id, conversation_id, asked_at, question, answer, summary,
-                              topics_json, entities_json, claims_json, sources_json)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT (message_id) DO UPDATE SET
-             conversation_id = excluded.conversation_id, asked_at = excluded.asked_at,
-             question = excluded.question, answer = excluded.answer, summary = excluded.summary,
-             topics_json = excluded.topics_json, entities_json = excluded.entities_json,
-             claims_json = excluded.claims_json, sources_json = excluded.sources_json`,
-        )
-        .run(
-          t.messageId,
-          t.conversationId,
-          t.askedAt,
-          t.question,
-          t.answer,
-          t.summary ?? null,
-          JSON.stringify(t.topics ?? []),
-          JSON.stringify(t.entities ?? []),
-          JSON.stringify(t.claims ?? []),
-          JSON.stringify(t.sources ?? []),
-        );
+    this.sql.transaction(() => {
+      this.sql.run(
+        `INSERT INTO turns (message_id, conversation_id, asked_at, question, answer, summary,
+                            topics_json, entities_json, claims_json, sources_json)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT (message_id) DO UPDATE SET
+           conversation_id = excluded.conversation_id, asked_at = excluded.asked_at,
+           question = excluded.question, answer = excluded.answer, summary = excluded.summary,
+           topics_json = excluded.topics_json, entities_json = excluded.entities_json,
+           claims_json = excluded.claims_json, sources_json = excluded.sources_json`,
+        t.messageId,
+        t.conversationId,
+        t.askedAt,
+        t.question,
+        t.answer,
+        t.summary ?? null,
+        JSON.stringify(t.topics ?? []),
+        JSON.stringify(t.entities ?? []),
+        JSON.stringify(t.claims ?? []),
+        JSON.stringify(t.sources ?? []),
+      );
       this.indexTurn(t);
-    })();
+    });
   }
 
-  updateTurnNotes(
-    messageId: string,
-    notes: { summary: string; topics: string[]; entities: string[]; claims: Claim[] },
-  ): void {
-    this.db.transaction(() => {
+  updateTurnNotes(messageId: string, notes: { summary: string; topics: string[]; entities: string[]; claims: Claim[] }): void {
+    this.sql.transaction(() => {
       const turn = this.getTurn(messageId);
       if (!turn) return;
-      this.db
-        .prepare(
-          'UPDATE turns SET summary = ?, topics_json = ?, entities_json = ?, claims_json = ? WHERE message_id = ?',
-        )
-        .run(notes.summary, JSON.stringify(notes.topics), JSON.stringify(notes.entities), JSON.stringify(notes.claims), messageId);
+      this.sql.run(
+        'UPDATE turns SET summary = ?, topics_json = ?, entities_json = ?, claims_json = ? WHERE message_id = ?',
+        notes.summary,
+        JSON.stringify(notes.topics),
+        JSON.stringify(notes.entities),
+        JSON.stringify(notes.claims),
+        messageId,
+      );
       this.indexTurn({ ...turn, ...notes });
-    })();
+    });
   }
 
   getTurn(messageId: string): TurnMemory | null {
-    const row = this.db.prepare('SELECT * FROM turns WHERE message_id = ?').get(messageId) as TurnRow | undefined;
+    const row = this.sql.get<TurnRow>('SELECT * FROM turns WHERE message_id = ?', messageId);
     return row ? toTurn(row) : null;
   }
 
   turnsBetween(startIso: string, endIso: string): Array<TurnMemory & { conversationTitle: string | null }> {
-    const rows = this.db
-      .prepare(
-        `SELECT t.*, c.title AS conversation_title
-           FROM turns t JOIN conversations c ON c.id = t.conversation_id
-          WHERE t.asked_at >= ? AND t.asked_at < ?
-          ORDER BY t.asked_at ASC`,
-      )
-      .all(startIso, endIso) as Array<TurnRow & { conversation_title: string | null }>;
+    const rows = this.sql.all<TurnRow & { conversation_title: string | null }>(
+      `SELECT t.*, c.title AS conversation_title
+         FROM turns t JOIN conversations c ON c.id = t.conversation_id
+        WHERE t.asked_at >= ? AND t.asked_at < ?
+        ORDER BY t.asked_at ASC`,
+      startIso,
+      endIso,
+    );
     return rows.map((r) => ({ ...toTurn(r), conversationTitle: r.conversation_title }));
   }
 
@@ -270,20 +248,21 @@ export class MemoryStore {
       .map((t) => `"${t.replace(/"/g, '""')}"`)
       .join(' OR ');
     if (!expr) return [];
+    const exclude = opts.excludeConversationId ?? null;
     try {
-      const rows = this.db
-        .prepare(
-          `SELECT t.*, c.title AS conversation_title, bm25(turns_fts) AS rank
-             FROM turns_fts
-             JOIN turns t ON t.message_id = turns_fts.message_id
-             JOIN conversations c ON c.id = t.conversation_id
-            WHERE turns_fts MATCH ? AND (? IS NULL OR t.conversation_id != ?)
-            ORDER BY rank
-            LIMIT ?`,
-        )
-        .all(expr, opts.excludeConversationId ?? null, opts.excludeConversationId ?? null, opts.limit ?? 8) as Array<
-        TurnRow & { conversation_title: string | null; rank: number }
-      >;
+      const rows = this.sql.all<TurnRow & { conversation_title: string | null; rank: number }>(
+        `SELECT t.*, c.title AS conversation_title, bm25(turns_fts) AS rank
+           FROM turns_fts
+           JOIN turns t ON t.message_id = turns_fts.message_id
+           JOIN conversations c ON c.id = t.conversation_id
+          WHERE turns_fts MATCH ? AND (? IS NULL OR t.conversation_id != ?)
+          ORDER BY rank
+          LIMIT ?`,
+        expr,
+        exclude,
+        exclude,
+        opts.limit ?? 8,
+      );
       // bm25 is negative and lower is better, so negate it: a higher score is a better match.
       return rows.map((r) => ({ ...toTurn(r), conversationTitle: r.conversation_title, score: -r.rank }));
     } catch {
@@ -293,22 +272,23 @@ export class MemoryStore {
   }
 
   recentConversations(limit = 15, excludeId?: string): ConversationListItem[] {
-    const rows = this.db
-      .prepare(
-        `SELECT c.*, COUNT(t.message_id) AS turns
-           FROM conversations c JOIN turns t ON t.conversation_id = c.id
-          WHERE (? IS NULL OR c.id != ?)
-          GROUP BY c.id
-          ORDER BY c.updated_at DESC
-          LIMIT ?`,
-      )
-      .all(excludeId ?? null, excludeId ?? null, limit) as Array<ConversationRow & { turns: number }>;
+    const exclude = excludeId ?? null;
+    const rows = this.sql.all<ConversationRow & { turns: number }>(
+      `SELECT c.*, COUNT(t.message_id) AS turns
+         FROM conversations c JOIN turns t ON t.conversation_id = c.id
+        WHERE (? IS NULL OR c.id != ?)
+        GROUP BY c.id
+        ORDER BY c.updated_at DESC
+        LIMIT ?`,
+      exclude,
+      exclude,
+      limit,
+    );
     return rows.map((r) => ({ ...toConversation(r), turns: r.turns }));
   }
 
   firstTurnAt(): string | null {
-    const row = this.db.prepare('SELECT MIN(asked_at) AS first FROM turns').get() as { first: string | null };
-    return row.first;
+    return this.sql.get<{ first: string | null }>('SELECT MIN(asked_at) AS first FROM turns')?.first ?? null;
   }
 
   /** Replace a turn's row in the search index. Called after every write that changes its text. */
@@ -321,8 +301,8 @@ export class MemoryStore {
       (t.entities ?? []).join(' '),
       (t.claims ?? []).map((c) => `${c.subject} ${c.attribute} ${c.value}`).join('\n'),
     ].join('\n');
-    this.db.prepare('DELETE FROM turns_fts WHERE message_id = ?').run(t.messageId);
-    this.db.prepare('INSERT INTO turns_fts (message_id, body) VALUES (?, ?)').run(t.messageId, body);
+    this.sql.run('DELETE FROM turns_fts WHERE message_id = ?', t.messageId);
+    this.sql.run('INSERT INTO turns_fts (message_id, body) VALUES (?, ?)', t.messageId, body);
   }
 }
 

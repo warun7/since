@@ -40,6 +40,12 @@ describe('contextMessage', () => {
     expect(text).not.toContain('[1]');
   });
 
+  it('says how many exchanges a named date holds, so the model never infers "no record"', () => {
+    const second = { ...hit, messageId: 'm2', askedAt: '2026-11-03T16:40:00.000Z', question: 'Is Bun production-ready?' };
+    const text = contextMessage({ clock, memory: memory({ refs: [nov3], hits: [hit, second] }), conversationSources: [], inHistory: new Set() });
+    expect(text).toContain('"on 3 November" = Tue 3 Nov 2026 — 2 past exchanges with the user on this date');
+  });
+
   it("doesn't repeat an exchange that is already in the conversation history", () => {
     const text = contextMessage({ clock, memory: memory({ hits: [hit] }), conversationSources: [], inHistory: new Set(['m1']) });
     expect(text).not.toContain('Cheapest managed Postgres?');

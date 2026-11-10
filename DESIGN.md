@@ -21,6 +21,8 @@ then, in the background: save title, summary and claims · optional upheld check
 
 The prompt also enforces honesty: never invent a past conversation, say first when a date has no record, and count only things dated after "since <date>".
 
+**Hosted the same way.** Memory sits behind a small synchronous `Sql` interface. Locally it's a SQLite file; on Cloudflare each visitor gets a Durable Object with its own built-in SQLite. The store, schema and API are the same code, and visitors never see each other's history. A Worker in front sets the visitor cookie and enforces a daily question budget.
+
 ## Considered and rejected
 
 - **A recall tool.** An extra round trip, and the model can forget to call it. Dates can be resolved in code.
@@ -32,7 +34,7 @@ The prompt also enforces honesty: never invent a past conversation, say first wh
 
 ## Evaluation
 
-`npm test`: 74 offline unit tests (dates across timezones, recall, ranking, passages, citations). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last run: 7/7 passed, 2.8 s average to the first token, 4.2 s in total.
+`npm test`: 75 offline unit tests (dates across timezones, recall, ranking, passages, citations). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 96% judge score, 2.8 s average to the first token, 4.1 s in total.
 
 upheld found what reading the answers didn't: a then/now table row mixes an old value with a new citation, so whole rows failed. Checking each cited cell separately raised support from 8/35 to 17/28. Most remaining flags are real errors, such as an old number cited to today's page.
 
@@ -42,4 +44,5 @@ upheld found what reading the answers didn't: a then/now table row mixes an old 
 - **Watch for changes:** re-check saved claims on a schedule, and open the next chat with what changed.
 - **Tighter diffs:** require each "now" value to be quoted from a passage.
 - **Fix before showing:** re-search flagged claims, once a faster checker fits the time budget.
-- Price extraction from pricing tables, better retrieval for long histories, multi-user auth, a bigger hand-labelled eval set.
+- **Sign-in,** so memory follows a person across devices; the demo keys it to a cookie.
+- Price extraction from pricing tables, better retrieval for long histories, a bigger hand-labelled eval set.

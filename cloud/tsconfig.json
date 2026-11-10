@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["worker.ts", "cloudflare.config.ts", "vite.config.ts", ".cloudflare/types/index.d.ts"]
+}

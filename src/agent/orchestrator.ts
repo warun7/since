@@ -11,7 +11,7 @@
 import { config } from '../config.js';
 import { type Message, streamChat, type ToolCall, type Usage } from '../llm/deepseek.js';
 import { recall } from '../memory/recall.js';
-import { MemoryStore } from '../memory/store.js';
+import type { MemoryStore } from '../memory/store.js';
 import { safeTz } from '../memory/temporal.js';
 import { processTurn } from '../memory/writer.js';
 import { DeepSeekSearch, formatResultsForModel, SourceRegistry, webSearch } from '../search/index.js';
@@ -22,8 +22,9 @@ import { contextMessage, historyMessages } from './context.js';
 import { ANSWER_NOW, SYSTEM_PROMPT, WEB_SEARCH_TOOL } from './prompts.js';
 
 export interface AgentDeps {
+  /** This user's memory. Node passes a SQLite file; the hosted Worker, the visitor's Durable Object. */
   store: MemoryStore;
-  provider: SearchProvider;
+  provider?: SearchProvider;
 }
 
 export interface TurnResult {
@@ -31,11 +32,11 @@ export interface TurnResult {
   messageId: string;
   content: string;
   trace: TurnTrace;
+  /** Settles when the background memory notes for this turn are written. */
+  notes: Promise<unknown>;
 }
 
-let defaultStore: MemoryStore | undefined;
 let defaultProvider: SearchProvider | undefined;
-export const getStore = (): MemoryStore => (defaultStore ??= MemoryStore.open());
 const getProvider = (): SearchProvider => (defaultProvider ??= new DeepSeekSearch());
 
 // Background work (memory notes) is tracked so scripts and evals can wait for it.
@@ -50,8 +51,8 @@ export async function flushBackground(): Promise<void> {
 
 const summarize = (s: Source): SourceSummary => ({ n: s.n, url: s.url, title: s.title, site: s.site, published: s.published });
 
-export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, deps: Partial<AgentDeps> = {}): Promise<TurnResult> {
-  const store = deps.store ?? getStore();
+export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, deps: AgentDeps): Promise<TurnResult> {
+  const store = deps.store;
   const provider = deps.provider ?? getProvider();
   const clock = { now: input.clock.now, tz: safeTz(input.clock.tz) };
   const t0 = performance.now();
@@ -178,7 +179,8 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
     sources: cited.map(summarize),
   };
   store.saveTurn(turn);
-  track(processTurn(store, turn, isNew || !conversation.title));
+  const notes = processTurn(store, turn, isNew || !conversation.title);
+  track(notes);
 
   if (upheldEnabled() && cited.length) {
     const verification = await verifyAnswer({ question: input.message, answer: content, sources: cited }, { signal: input.signal });
@@ -186,7 +188,7 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
     emit({ type: 'verification', messageId, verification });
   }
 
-  return { conversationId, messageId, content, trace };
+  return { conversationId, messageId, content, trace, notes };
 
   function persistAnswer(text: string): { messageId: string; cited: Source[] } {
     trace.timings.totalMs = elapsed();
