@@ -27,18 +27,20 @@ The prompt also enforces honesty: never invent a past conversation, say first wh
 
 **Hosted the same way.** A synchronous `Sql` interface: SQLite locally, a Durable Object per visitor on Cloudflare. Shared store, schema and API; a Worker in front sets the cookie and meters questions per visitor, per network and site-wide. upheld stays local: it needs its own models.
 
+**Cost and scale.** A searching answer spends about 0.6¢ on the Search API (median seven queries at $0.75 per 1,000) and 0.07¢ on reasoning, which is why a step is capped at 8 queries and a turn at 3 rounds; 1,500 questions a day bound the bill. One DeepSeek key covers model and search, and the model client speaks the OpenAI API, so the model is a config change while the search is not. At a hundred times the traffic the first bottleneck is the single Budget Durable Object that meters every question, then the per-isolate query cache, then cold starts — none of which needs a change to the agent loop.
+
 ## Considered and rejected
 
 - **A recall tool.** An extra round trip, and the model can forget to call it. Dates resolve in code.
 - **A planner call.** 1–2 s on every message, and the first `web_search` call already is one.
-- **mem0 or Supermemory.** They return the latest version of a fact about the user; these questions need the exact words of a past answer, found by date. Each adds a key and a network call per message, as would embeddings: DeepSeek has none.
+- **mem0 or Supermemory.** They return the latest version of a fact about the user; these questions need the exact words of a past answer, found by date. Each adds a key and a call per message, as would embeddings (DeepSeek has none).
 - **Thinking off, or effort per question.** Off is 4.6 s faster to the first token (p50) but gets multi-step maths wrong in both eval runs (`evals/effort/`). At low nothing failed for lack of thinking, so a router or `high` would only add latency.
 - **upheld before showing the answer.** 0.3–3 s per claim, so it runs after the answer, and in evals.
-- **A fetch tool or a framework.** The brief allows one tool, so page reading is part of search; one ~300-line agent loop keeps parallelism, prompt order and streaming ours, and the UI is one JS file with no build step.
+- **A fetch tool or a framework.** The brief allows one tool, so page reading is part of search; one ~300-line loop keeps parallelism, prompt order and streaming ours, and the UI is one JS file with no build step.
 
 ## Evaluation
 
-`npm test`: 105 offline unit tests. `npm run eval`: 15 scenarios with a fixed clock and fixture history — the brief's questions reworded, reasoning with no search, comparisons — judged against a rubric plus checks on search use, grounding and upheld's support. Two runs at each effort (`evals/effort/`): at low, 30/30 behaviour checks and 98% judge; off, 93%, the misses being wrong answers. The judge is DeepSeek judging DeepSeek, the harness's weakest part; a cross-family judge is the next step. The rewording found a real gap: "on the 3rd" didn't resolve to a date. It does now.
+`npm test`: 105 offline unit tests. `npm run eval`: 15 scenarios with a fixed clock and fixture history — the brief's questions reworded, reasoning with no search, comparisons — judged against a rubric plus search-use, grounding and upheld checks. Two runs at each effort (`evals/effort/`): at low, 30/30 behaviour checks and 98% judge; off, 93%, the misses being wrong answers. The judge is DeepSeek judging DeepSeek, the harness's weakest part; a cross-family judge is the next step. The rewording found a real gap: "on the 3rd" didn't resolve to a date. It does now.
 
 upheld caught what reading the answers didn't: in then/now tables one citation covered a row, so old values were cited to today's page. Citing each cell separately took supported citations from 8 of 35 to 17 of 28 (`evals/last-run/`). The grounding check is cruder but always on: upheld agreed with all 5 of its flags, and with one figure per claim made wrong it caught 110 of 122.
 

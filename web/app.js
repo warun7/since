@@ -1106,6 +1106,8 @@ function renderEmpty() {
       'section',
       { class: 'empty' },
       el('p', { class: 'empty-lead' }, 'Ask anything. I search the web, cite sources, and remember our past conversations by date.'),
+      // The offer comes first: without history, the example questions about memory can't work.
+      el('div', { class: 'offer-slot' }),
       el('div', { class: 'chips' }, chips),
     ),
   );
@@ -1117,11 +1119,11 @@ function renderEmpty() {
  * last Monday and 3 November), so the memory questions can be tried straight away.
  */
 function paintExampleOffer() {
-  const empty = dom.threadInner.querySelector('.empty');
-  if (!empty) return;
-  const current = empty.querySelector('.example-offer');
+  const slot = dom.threadInner.querySelector('.offer-slot');
+  if (!slot) return;
+  const current = slot.querySelector('.example-offer');
   if (current?.dataset.done) return;
-  current?.remove();
+  slot.replaceChildren();
   if (!state.conversationsLoaded || state.conversations.length) return;
 
   const button = el('button', { type: 'button', class: 'example-btn' }, 'Add example history');
@@ -1131,7 +1133,7 @@ function paintExampleOffer() {
     el(
       'p',
       { class: 'muted small' },
-      'No past conversations yet. To try questions about them, add three real ones from last Tuesday, last Monday and 3 November.',
+      'Memory needs something to remember. Add three real conversations — last Tuesday, last Monday and 3 November — then ask what has changed since.',
     ),
     button,
   );
@@ -1147,7 +1149,7 @@ function paintExampleOffer() {
       });
       if (!res.ok) throw new Error(await errorFrom(res));
       offer.dataset.done = '1';
-      offer.replaceChildren(el('p', { class: 'muted small' }, 'Added. They are in the sidebar: ask about them with the first two questions above.'));
+      offer.replaceChildren(el('p', { class: 'muted small' }, 'Added. They are in the sidebar: ask about them with the first two questions below.'));
       await refreshSidebar();
     } catch (err) {
       button.disabled = false;
@@ -1155,7 +1157,7 @@ function paintExampleOffer() {
       offer.append(el('p', { class: 'turn-error small', role: 'alert' }, err.message));
     }
   });
-  empty.append(offer);
+  slot.append(offer);
 }
 
 function setHash(id) {

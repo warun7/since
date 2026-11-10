@@ -868,11 +868,18 @@ button.verify-badge { cursor: pointer; }
 
 .chip:hover { border-color: var(--accent); }
 
+/* Sits above the example chips: the memory questions can't work on an empty memory. */
+.offer-slot:empty { display: none; }
+
 .example-offer {
   max-width: 520px;
-  margin: 28px auto 0;
+  margin: 0 auto 26px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
   display: grid;
-  gap: 10px;
+  gap: 12px;
   justify-items: center;
 }
 
