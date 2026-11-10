@@ -63,7 +63,7 @@ export function contextMessage(input: { clock: Clock; memory: RecallResult; conv
   // Exchanges already in the history above need no second copy.
   const hits = memory.hits.filter((h) => !input.inHistory.has(h.messageId)).sort((a, b) => a.askedAt.localeCompare(b.askedAt));
   if (hits.length) {
-    out.push('', 'Past exchanges retrieved for this message (oldest first). Source numbers from those conversations are not valid here; cite only sources from this conversation.');
+    out.push('', 'Past exchanges retrieved for this message (oldest first). They are your own earlier words, not verified facts. Source numbers from those conversations are not valid here; cite only sources from this conversation.');
     for (const h of hits) out.push('', ...pastExchange(h, tz));
   } else if (memory.firstMemoryAt) {
     out.push('', 'No past exchange matched this message.');

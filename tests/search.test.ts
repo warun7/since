@@ -164,7 +164,7 @@ describe('webSearch', () => {
       cached: false,
       error: 'upstream 500',
     });
-    expect(formatResultsForModel(out)).toContain('No results: "neon fails" (upstream 500)');
+    expect(formatResultsForModel(out)).toContain('No results: "neon fails" (search failed)');
   });
 
   it('serves a repeated query from the cache', async () => {

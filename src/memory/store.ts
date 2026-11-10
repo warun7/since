@@ -287,6 +287,10 @@ export class MemoryStore {
     return rows.map((r) => ({ ...toConversation(r), turns: r.turns }));
   }
 
+  isEmpty(): boolean {
+    return !this.sql.get('SELECT 1 FROM conversations LIMIT 1');
+  }
+
   firstTurnAt(): string | null {
     return this.sql.get<{ first: string | null }>('SELECT MIN(asked_at) AS first FROM turns')?.first ?? null;
   }

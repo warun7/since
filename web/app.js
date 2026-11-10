@@ -539,8 +539,17 @@ function renderMarkdown(text) {
   // tilde in front of a number or currency sign; "~~deleted~~" still works.
   const prepared = text.replace(/(^|[^~\\])~(?=[\d$€£¥≈])/g, '$1\\~');
   const html = marked.parse(prepared, { gfm: true, breaks: true, async: false });
-  return DOMPurify.sanitize(String(html));
+  return DOMPurify.sanitize(String(html), PURIFY);
 }
+
+// Answers are model output written from web pages, so they get text, links and tables only.
+// No images or media in particular: those load without a click, and their URL could carry
+// anything the model was led to put in it (the page's CSP blocks them too).
+const PURIFY = {
+  USE_PROFILES: { html: true },
+  FORBID_TAGS: ['img', 'picture', 'source', 'video', 'audio', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'style', 'link', 'meta'],
+  FORBID_ATTR: ['style', 'srcset', 'action', 'formaction', 'background', 'poster'],
+};
 
 function wrapTables(root) {
   for (const table of root.querySelectorAll('table')) {

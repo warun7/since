@@ -133,10 +133,16 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
       });
 
       const s0 = performance.now();
+      // At most QUERIES_PER_STEP queries a step, however many calls they arrive in: a question's
+      // cost has a ceiling (3 steps × 8), whatever the model, or a page it read, asks for.
+      let left = QUERIES_PER_STEP;
       const outputs = await Promise.all(
         result.toolCalls.map(async (tc) => {
-          const queries = parseQueries(tc);
-          if (!queries) return { tc, text: 'Invalid arguments. Call web_search with {"queries": [{"q": "..."}]}.' };
+          const parsed = parseQueries(tc);
+          if (!parsed) return { tc, text: 'Invalid arguments. Call web_search with {"queries": [{"q": "..."}]}.' };
+          const queries = parsed.slice(0, left);
+          left -= queries.length;
+          if (!queries.length) return { tc, text: `Not run: ${QUERIES_PER_STEP} queries is the limit for one step. Use the results you have.` };
           emit({ type: 'search', step, queries });
           const outcome = await webSearch(queries, { question: input.message, registry, provider, signal: input.signal });
           emit({ type: 'sources', step, sources: outcome.sources.map(summarize) });
@@ -207,6 +213,9 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   }
 }
 
+/** Search queries one step may run, across all its tool calls. */
+const QUERIES_PER_STEP = 8;
+
 function parseQueries(tc: ToolCall): SearchQuery[] | null {
   if (tc.name !== 'web_search') return null;
   try {
@@ -222,7 +231,7 @@ function parseQueries(tc: ToolCall): SearchQuery[] | null {
         return null;
       })
       .filter((q): q is SearchQuery => Boolean(q?.q.trim()));
-    return queries.length ? queries.slice(0, 8) : null;
+    return queries.length ? queries.slice(0, QUERIES_PER_STEP) : null;
   } catch {
     return null;
   }
@@ -244,5 +253,6 @@ function friendlyError(err: unknown): string {
   if (status === 401) return 'The DeepSeek API key was rejected. Check DEEPSEEK_API_KEY in .env.';
   if (status === 402) return 'The DeepSeek account is out of balance.';
   if (status === 429) return 'DeepSeek is rate-limiting requests. Try again in a moment.';
-  return `Something went wrong: ${err instanceof Error ? err.message : String(err)}`;
+  // The details (status, provider message) go to the server log, not to the page.
+  return 'Something went wrong while answering. Try again in a moment.';
 }

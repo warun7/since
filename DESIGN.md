@@ -21,7 +21,7 @@ then, in the background: save title, summary and claims · optional upheld check
 
 The prompt also enforces honesty: never invent a past conversation, say first when a date has no record, and count only things dated after "since <date>".
 
-**Hosted the same way.** Memory sits behind a small synchronous `Sql` interface. Locally it's a SQLite file; on Cloudflare each visitor gets a Durable Object with its own built-in SQLite. The store, schema and API are the same code, and visitors never see each other's history. A Worker in front sets the visitor cookie and enforces a daily question budget.
+**Hosted the same way.** Memory sits behind a small synchronous `Sql` interface. Locally it's a SQLite file; on Cloudflare each visitor gets a Durable Object with its own built-in SQLite. The store, schema and API are the same code, and visitors never see each other's history. A Worker in front sets the visitor cookie and rate-limits each network; questions are counted per visitor, per network and site-wide, and only once they've passed every check.
 
 ## Considered and rejected
 
@@ -34,7 +34,7 @@ The prompt also enforces honesty: never invent a past conversation, say first wh
 
 ## Evaluation
 
-`npm test`: 75 offline unit tests (dates across timezones, recall, ranking, passages, citations). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 96% judge score, 2.8 s average to the first token, 4.1 s in total.
+`npm test`: 81 offline unit tests (dates across timezones, recall, ranking, passages, citations, API limits). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 100% judge score, 3.4 s average to the first token, 4.8 s in total.
 
 upheld found what reading the answers didn't: a then/now table row mixes an old value with a new citation, so whole rows failed. Checking each cited cell separately raised support from 8/35 to 17/28. Most remaining flags are real errors, such as an old number cited to today's page.
 

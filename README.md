@@ -15,7 +15,7 @@ Needs Node 22+ and a [DeepSeek API key](https://platform.deepseek.com/api_keys).
 ```bash
 npm install
 cp .env.example .env   # then set DEEPSEEK_API_KEY
-npm run dev            # http://localhost:3000
+npm run dev            # http://localhost:3000, this machine only (HOST=0.0.0.0 to share it)
 ```
 
 Memory lives in `data/since.db` (SQLite). Delete it to start over.
@@ -47,9 +47,11 @@ npm run typecheck
 
 ## Hosting
 
-The live demo runs on Cloudflare, from [`cloud/`](cloud/). The code is the same as `npm run dev`; only the storage and the entry point change. A Worker gives each visitor an id in a cookie and forwards their API calls to that visitor's own Durable Object. The Durable Object holds the visitor's memory in its built-in SQLite, behind the same `MemoryStore` as the local SQLite file. Each visitor gets 40 questions a day, and the whole site 1,500.
+The live demo runs on Cloudflare, from [`cloud/`](cloud/). The code is the same as `npm run dev`; only the storage and the entry point change. A Worker gives each visitor an id in a cookie and forwards their API calls to that visitor's own Durable Object. The Durable Object holds the visitor's memory in its built-in SQLite, behind the same `MemoryStore` as the local SQLite file. A memory is deleted 30 days after its last visit.
 
-`since.varunsg.com` is a tiny Cloudflare Pages site ([`cloud/pages/_worker.js`](cloud/pages/_worker.js)) that passes every request to the Worker. The domain's DNS is at Hostinger, and a Pages site can take a domain by CNAME where a Worker can't.
+So the demo can't be run up: 40 questions a day per visitor, 60 per network (IP address) and 1,500 for the whole site, charged only once a question has passed every check; 30 API requests a minute per network; and at most 8 searches per step, 3 steps per question. Every response has a strict Content-Security-Policy (no images from other sites, so an answer can't leak memory through an image URL), and changes are accepted only from the site's own pages.
+
+`since.varunsg.com` is a tiny Cloudflare Pages site ([`cloud/pages/_worker.js`](cloud/pages/_worker.js)) that passes every request to the Worker. The domain's DNS is at Hostinger, and a Pages site can take a domain by CNAME where a Worker can't. The pages.dev and workers.dev addresses redirect to it, so each person has one address and one memory.
 
 To deploy your own (needs a Cloudflare account; `cloud/` has its own dependencies, so the root install stays small):
 
@@ -59,7 +61,7 @@ npx cf auth login
 npx cf deploy --secrets-file ../.env   # uploads the keys in .env as Worker secrets
 ```
 
-`npx cf dev` in `cloud/` runs the Worker locally (put the key in `cloud/.dev.vars`).
+Set `CANONICAL_ORIGIN` in `cloud/cloudflare.config.ts` to your own address, or remove it to serve from workers.dev. `npx cf dev` in `cloud/` runs the Worker locally (put the key in `cloud/.dev.vars`).
 
 ## Optional: citation checks with upheld
 
