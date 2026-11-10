@@ -4,7 +4,7 @@
 // `npm run dev`, so visitors never see each other's history. The UI is static assets.
 import { DurableObject } from 'cloudflare:workers';
 import type { Hono } from 'hono';
-import { createApi } from '../src/app.js';
+import { chatMessage, createApi, crossSite, MAX_BODY_BYTES } from '../src/app.js';
 import { SECURITY_HEADERS } from '../src/headers.js';
 import { migrate } from '../src/memory/schema.js';
 import type { Sql } from '../src/memory/sql.js';
@@ -110,26 +110,35 @@ export class Visitor extends DurableObject<Env> {
 
   /** The site-wide and per-network daily limits, charged only for a request about to run. */
   private async admit(cost: number, request: Request): Promise<string | null> {
-    const network = await hash(request.headers.get('CF-Connecting-IP') ?? 'unknown');
     const { Budget } = exportsOf(this.ctx);
-    return Budget.get(Budget.idFromName('global')).take(cost, network);
+    return Budget.get(Budget.idFromName('global')).take(cost, request.headers.get('CF-Connecting-IP') ?? 'unknown');
   }
 }
 
-/** Daily question counts: one row for the whole site, one per network. One instance, "global". */
+/**
+ * Daily question counts: one row for the whole site, one per network. One instance, "global".
+ * A network is kept as an HMAC of its address under a random key made for that day. The key
+ * never leaves this object and is deleted with the day's counts, so an old row can't be traced
+ * back to an address, even by trying every address there is.
+ */
 export class Budget extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    ctx.storage.sql.exec('DROP TABLE IF EXISTS days');
-    ctx.storage.sql.exec(
-      'CREATE TABLE IF NOT EXISTS usage (day TEXT NOT NULL, key TEXT NOT NULL, questions INTEGER NOT NULL, PRIMARY KEY (day, key))',
-    );
+    const sql = ctx.storage.sql;
+    sql.exec('DROP TABLE IF EXISTS days');
+    sql.exec('CREATE TABLE IF NOT EXISTS usage (day TEXT NOT NULL, key TEXT NOT NULL, questions INTEGER NOT NULL, PRIMARY KEY (day, key))');
+    const firstKeyedRun = sql.exec("SELECT 1 FROM sqlite_master WHERE name = 'keys'").toArray().length === 0;
+    sql.exec('CREATE TABLE IF NOT EXISTS keys (day TEXT PRIMARY KEY, secret BLOB NOT NULL)');
+    // Per-network rows from before the keyed hash used a plain one, which can be reversed.
+    if (firstKeyedRun) sql.exec("DELETE FROM usage WHERE key != '*'");
   }
 
   /** Counts `cost` questions against today, or returns why not (and counts nothing). */
-  take(cost: number, network: string): string | null {
-    const sql = this.ctx.storage.sql;
+  async take(cost: number, address: string): Promise<string | null> {
     const day = new Date().toISOString().slice(0, 10);
+    const network = await this.pseudonym(address, day);
+    // Nothing below awaits, so no other request's count can land between the check and the write.
+    const sql = this.ctx.storage.sql;
     const used = (key: string) =>
       (sql.exec('SELECT questions FROM usage WHERE day = ? AND key = ?', day, key).toArray()[0]?.questions as number | undefined) ?? 0;
     if (used('*') + cost > QUESTIONS_PER_DAY) return `The demo has used its questions for today. Try again tomorrow. ${RUN_IT_YOURSELF}`;
@@ -145,7 +154,20 @@ export class Budget extends DurableObject<Env> {
       );
     }
     sql.exec('DELETE FROM usage WHERE day < ?', day);
+    sql.exec('DELETE FROM keys WHERE day < ?', day);
     return null;
+  }
+
+  private async pseudonym(address: string, day: string): Promise<string> {
+    const sql = this.ctx.storage.sql;
+    let secret = sql.exec('SELECT secret FROM keys WHERE day = ?', day).toArray()[0]?.secret as ArrayBuffer | undefined;
+    if (!secret) {
+      secret = crypto.getRandomValues(new Uint8Array(32)).buffer;
+      sql.exec('INSERT INTO keys (day, secret) VALUES (?, ?)', day, secret);
+    }
+    const key = await crypto.subtle.importKey('raw', secret, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(address));
+    return [...new Uint8Array(mac).slice(0, 12)].map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 }
 
@@ -174,19 +196,49 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
   const known = cookie(request, COOKIE);
   const visitor = known && VISITOR_ID.test(known) ? known : null;
   if (!visitor) {
-    // Nothing stored yet, so nothing to read or delete: answer without creating a memory.
-    if (request.method === 'GET' && url.pathname === '/api/conversations') return Response.json({ conversations: [] });
-    if (request.method !== 'POST') return Response.json({ error: 'not found' }, { status: 404 });
+    const answer = await withoutMemory(request, url);
+    if (answer) return answer;
   }
 
   const id = visitor ?? crypto.randomUUID();
   const { Visitor } = exportsOf(ctx);
   const response = await Visitor.get(Visitor.idFromName(id)).fetch(request);
-  if (visitor) return response;
+  if (visitor) {
+    // Forgetting everything retires the id too: the next visit starts with a new one.
+    if (request.method !== 'DELETE' || url.pathname !== '/api/conversations' || !response.ok) return response;
+    const retired = new Response(response.body, response);
+    retired.headers.append('Set-Cookie', `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict`);
+    return retired;
+  }
 
   const withCookie = new Response(response.body, response);
   withCookie.headers.append('Set-Cookie', `${COOKIE}=${id}; Path=/; Max-Age=31536000; HttpOnly; Secure; SameSite=Strict`);
   return withCookie;
+}
+
+/**
+ * For a visitor with no memory yet: the answer to anything that doesn't need one. Only a request
+ * that will really run (a valid question, or example history) goes on to create a memory.
+ */
+async function withoutMemory(request: Request, url: URL): Promise<Response | null> {
+  if (request.method === 'GET' && url.pathname === '/api/conversations') return Response.json({ conversations: [] });
+  const creates = request.method === 'POST' && (url.pathname === '/api/chat' || url.pathname === '/api/example-history');
+  if (!creates) return Response.json({ error: 'not found' }, { status: 404 });
+  if (crossSite(request)) return Response.json({ error: 'Cross-site request refused.' }, { status: 403 });
+  if (url.pathname !== '/api/chat') return null;
+
+  const tooLarge = () => Response.json({ error: 'request is too large' }, { status: 413 });
+  if (Number(request.headers.get('Content-Length') ?? 0) > MAX_BODY_BYTES) return tooLarge();
+  const text = await request.clone().text();
+  if (text.length > MAX_BODY_BYTES) return tooLarge();
+  let body: unknown = null;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    // Not JSON: chatMessage reports it as a missing message, as the API itself does.
+  }
+  const message = chatMessage(body);
+  return typeof message === 'string' ? null : Response.json({ error: message.error }, { status: message.status });
 }
 
 function withSecurityHeaders(response: Response): Response {
@@ -204,10 +256,4 @@ function cookie(request: Request, name: string): string | undefined {
     if (key === name) found = value.join('=');
   }
   return found;
-}
-
-/** Networks are counted by a hash of the address, not the address itself. */
-async function hash(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(digest).slice(0, 12)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }

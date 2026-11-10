@@ -23,7 +23,19 @@ export interface ApiOptions {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const MAX_BODY_BYTES = 64 * 1024;
+export const MAX_BODY_BYTES = 64 * 1024;
+const MAX_MESSAGE_CHARS = 8000;
+
+type ChatBody = { conversationId?: string; message?: string; tz?: string };
+
+/** The question in a chat request's body, or why there isn't a usable one. */
+export function chatMessage(body: unknown): string | { error: string; status: 400 | 413 } {
+  const raw = (body as ChatBody | null)?.message;
+  const message = typeof raw === 'string' ? raw.trim() : '';
+  if (!message) return { error: 'message is required', status: 400 };
+  if (message.length > MAX_MESSAGE_CHARS) return { error: 'message is too long', status: 413 };
+  return message;
+}
 
 export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
   const app = new Hono();
@@ -54,16 +66,21 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
     return c.json({ conversation, messages: store.getMessages(conversation.id) });
   });
 
+  // Forget everything: every conversation, with its messages, sources and memory notes.
+  app.delete('/api/conversations', (c) => {
+    store.clearAll();
+    return c.json({ ok: true });
+  });
+
   app.delete('/api/conversations/:id', (c) => {
     store.deleteConversation(c.req.param('id'));
     return c.json({ ok: true });
   });
 
   app.post('/api/chat', async (c) => {
-    const body = await c.req.json<{ conversationId?: string; message?: string; tz?: string }>().catch(() => ({}) as Record<string, never>);
-    const message = typeof body.message === 'string' ? body.message.trim() : '';
-    if (!message) return c.json({ error: 'message is required' }, 400);
-    if (message.length > 8000) return c.json({ error: 'message is too long' }, 413);
+    const body = ((await c.req.json().catch(() => null)) ?? {}) as ChatBody;
+    const message = chatMessage(body);
+    if (typeof message !== 'string') return c.json({ error: message.error }, message.status);
     if (questionsPerDay && store.questionsSince(new Date(Date.now() - DAY_MS).toISOString()) >= questionsPerDay) {
       return c.json({ error: `This demo allows ${questionsPerDay} questions a day. Run it yourself for more: github.com/warun7/since` }, 429);
     }
@@ -100,7 +117,7 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
   // and only once at a time: a double click must not seed twice.
   let seeding: Promise<Response> | null = null;
   app.post('/api/example-history', async (c) => {
-    const body = await c.req.json<{ tz?: string }>().catch(() => ({}) as Record<string, never>);
+    const body = ((await c.req.json().catch(() => null)) ?? {}) as { tz?: string };
     if (seeding || store.firstTurnAt()) return c.json({ error: 'Example history can only be added to an empty memory.' }, 409);
     seeding = (async () => {
       const tz = body.tz || config.defaultTz;
@@ -123,7 +140,7 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
  * Browsers label every request with Sec-Fetch-Site (older ones send Origin). A request with
  * neither isn't from a browser, so it carries no visitor's cookie to misuse.
  */
-function crossSite(request: Request): boolean {
+export function crossSite(request: Request): boolean {
   const site = request.headers.get('Sec-Fetch-Site');
   if (site) return site !== 'same-origin' && site !== 'none';
   const origin = request.headers.get('Origin');

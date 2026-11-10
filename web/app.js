@@ -18,6 +18,7 @@ const EXAMPLES = [
 const dom = {
   convList: document.querySelector('#conv-list'),
   newChat: document.querySelector('#new-chat'),
+  forgetAll: document.querySelector('#forget-all'),
   menuBtn: document.querySelector('#menu-btn'),
   scrim: document.querySelector('#scrim'),
   title: document.querySelector('#title'),
@@ -125,6 +126,10 @@ const api = {
   conversation: (id) => getJSON(`/api/conversations/${encodeURIComponent(id)}`),
   async remove(id) {
     const res = await fetch(`/api/conversations/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(await errorFrom(res));
+  },
+  async removeAll() {
+    const res = await fetch('/api/conversations', { method: 'DELETE' });
     if (!res.ok) throw new Error(await errorFrom(res));
   },
 };
@@ -337,6 +342,7 @@ function renderSidebar() {
     nodes.push(el('ul', { class: 'conv-group' }, convs.map(convItem)));
   }
   dom.convList.replaceChildren(...nodes);
+  dom.forgetAll.hidden = !state.conversations.length;
   setActiveInSidebar(state.conversationId);
 }
 
@@ -380,6 +386,18 @@ async function deleteConversation(conv) {
     return;
   }
   if (conv.id === state.conversationId) newChat();
+  await refreshSidebar();
+}
+
+async function forgetEverything() {
+  if (!confirm('Delete every conversation since remembers? This cannot be undone.')) return;
+  try {
+    await api.removeAll();
+  } catch (err) {
+    alert(`Couldn't delete your memory. ${err.message}`);
+    return;
+  }
+  newChat();
   await refreshSidebar();
 }
 
@@ -1142,6 +1160,7 @@ function onHashChange() {
 
 function wireChrome() {
   dom.newChat.addEventListener('click', newChat);
+  dom.forgetAll.addEventListener('click', forgetEverything);
   dom.menuBtn.addEventListener('click', () => setNav(!document.body.classList.contains('nav-open')));
   dom.scrim.addEventListener('click', closeNav);
   document.addEventListener('keydown', (e) => {

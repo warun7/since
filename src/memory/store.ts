@@ -96,6 +96,13 @@ export class MemoryStore {
     });
   }
 
+  /** Deletes everything this memory holds. */
+  clearAll(): void {
+    this.sql.transaction(() => {
+      for (const table of ['turns_fts', 'sources', 'turns', 'messages', 'conversations']) this.sql.run(`DELETE FROM ${table}`);
+    });
+  }
+
   setTitle(id: string, title: string): void {
     this.sql.run('UPDATE conversations SET title = ? WHERE id = ?', title, id);
   }

@@ -34,7 +34,7 @@ The prompt also enforces honesty: never invent a past conversation, say first wh
 
 ## Evaluation
 
-`npm test`: 81 offline unit tests (dates across timezones, recall, ranking, passages, citations, API limits). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 100% judge score, 3.4 s average to the first token, 4.8 s in total.
+`npm test`: 83 offline unit tests (dates across timezones, recall, ranking, passages, citations, API limits). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 100% judge score, 3.4 s average to the first token, 4.8 s in total.
 
 upheld found what reading the answers didn't: a then/now table row mixes an old value with a new citation, so whole rows failed. Checking each cited cell separately raised support from 8/35 to 17/28. Most remaining flags are real errors, such as an old number cited to today's page.
 
@@ -44,5 +44,5 @@ upheld found what reading the answers didn't: a then/now table row mixes an old 
 - **Watch for changes:** re-check saved claims on a schedule, and open the next chat with what changed.
 - **Tighter diffs:** require each "now" value to be quoted from a passage.
 - **Fix before showing:** re-search flagged claims, once a faster checker fits the time budget.
-- **Sign-in,** so memory follows a person across devices; the demo keys it to a cookie.
+- **Sign-in,** so memory follows a person across devices; the demo keys it to a cookie holding a random id, so whoever has the cookie has the memory.
 - Price extraction from pricing tables, better retrieval for long histories, a bigger hand-labelled eval set.
