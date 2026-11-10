@@ -6,6 +6,7 @@ import { streamSSE } from 'hono/streaming';
 import { runTurn } from './agent/orchestrator.js';
 import { config } from './config.js';
 import { demoSeeds, seedDemoHistory } from './demo/seed.js';
+import { describeError } from './log.js';
 import type { MemoryStore } from './memory/store.js';
 import type { AgentEvent } from './types.js';
 import { upheldEnabled, upheldHealth } from './verify/upheld.js';
@@ -98,16 +99,16 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
       try {
         await runTurn(
           {
-            conversationId: body.conversationId || undefined,
+            conversationId: typeof body.conversationId === 'string' ? body.conversationId || undefined : undefined,
             message,
-            clock: { now: new Date(), tz: body.tz || config.defaultTz },
+            clock: { now: new Date(), tz: timezone(body.tz) },
             signal: abort.signal,
           },
           emit,
           { store },
         );
       } catch (err) {
-        if (!abort.signal.aborted) console.error('[turn]', err);
+        if (!abort.signal.aborted) console.error('[turn]', describeError(err));
       }
       await writes;
     });
@@ -120,11 +121,12 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
     const body = ((await c.req.json().catch(() => null)) ?? {}) as { tz?: string };
     if (seeding || store.firstTurnAt()) return c.json({ error: 'Example history can only be added to an empty memory.' }, 409);
     seeding = (async () => {
-      const tz = body.tz || config.defaultTz;
+      const tz = timezone(body.tz);
       const refused = await admit?.(demoSeeds(new Date(), tz).length, c.req.raw);
       if (refused) return c.json({ error: refused }, 429);
       const results = await seedDemoHistory(store, { tz });
       const failed = results.filter((r) => r.error);
+      // The seeds are the demo's own questions, so their errors can't quote a user.
       for (const r of failed) console.error('[example-history]', r.seed.label, r.error);
       return c.json({ added: results.length - failed.length, failed: failed.length }, failed.length === results.length ? 502 : 200);
     })().finally(() => {
@@ -135,6 +137,9 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
 
   return app;
 }
+
+/** The browser's time zone, if it sent one as text. */
+const timezone = (tz: unknown): string => (typeof tz === 'string' && tz ? tz : config.defaultTz);
 
 /**
  * Browsers label every request with Sec-Fetch-Site (older ones send Origin). A request with

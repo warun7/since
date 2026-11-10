@@ -63,8 +63,10 @@ const setMeta = (storage: DurableObjectStorage, key: string, value: number) =>
   void storage.sql.exec('INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value', key, value);
 
 /** The shared code reads its settings from process.env, as it does on Node. */
-function useSecrets(env: Env): void {
+function useSettings(env: Env): void {
   process.env.DEEPSEEK_API_KEY ||= env.DEEPSEEK_API_KEY;
+  // Logs say what failed, never with the user's words: they'd outlive the 30-day memory.
+  process.env.LOG_DETAILS ||= '0';
 }
 
 /** One visitor's memory and API. */
@@ -73,7 +75,7 @@ export class Visitor extends DurableObject<Env> {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    useSecrets(env);
+    useSettings(env);
   }
 
   /** Opened on first use, and again after the alarm has deleted everything. */

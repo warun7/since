@@ -26,6 +26,10 @@ export const config = {
   get port() {
     return int('PORT', 3000);
   },
+  /** False (LOG_DETAILS=0) logs errors by kind and status only, without their text. */
+  get logDetails() {
+    return env('LOG_DETAILS') !== '0';
+  },
   get dbPath() {
     return env('DB_PATH') ?? 'data/since.db';
   },

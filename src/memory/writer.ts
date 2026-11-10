@@ -1,6 +1,7 @@
 // Writes memory notes for a finished exchange. Runs in the background after the answer has been
 // sent, so it is never on the chat's critical path.
 import { chatJSON } from '../llm/deepseek.js';
+import { describeError } from '../log.js';
 import type { Claim, SourceSummary, TurnMemory } from '../types.js';
 import type { MemoryStore } from './store.js';
 
@@ -131,7 +132,7 @@ export async function writeMemoryNotes(input: NotesInput, llm: JsonLLM = default
     return parseNotes(raw, input);
   } catch (err) {
     // Memory still needs something to search on, so store the plain answer text instead of nothing.
-    console.warn('memory: notes call failed, storing fallback notes', err);
+    console.warn('memory: notes call failed, storing fallback notes', describeError(err));
     return fallbackNotes(input.answer);
   }
 }
@@ -150,7 +151,7 @@ export async function processTurn(
     { question: turn.question, answer: turn.answer, sources: turn.sources, askedAt: turn.askedAt, needsTitle },
     llm,
   ).catch((err: unknown) => {
-    console.warn('memory: could not write notes', err);
+    console.warn('memory: could not write notes', describeError(err));
     return fallbackNotes(turn.answer);
   });
   try {
@@ -164,7 +165,7 @@ export async function processTurn(
     });
     if (notes.title) store.setTitle(turn.conversationId, notes.title);
   } catch (err) {
-    console.warn('memory: could not save notes', err);
+    console.warn('memory: could not save notes', describeError(err));
   }
   return notes;
 }

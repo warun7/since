@@ -1,3 +1,4 @@
+import { describeError } from '../log.js';
 import type { QueryStat, RawResult, SearchOutcome, SearchProvider, SearchQuery, Source } from '../types.js';
 import { TTLCache } from './cache.js';
 import { DeepSeekSearch } from './deepseek.js';
@@ -106,7 +107,8 @@ async function runQuery(
     cache.set(key, hits);
     return { hits, stat: { query, hits: hits.length, ms: Date.now() - t0, cached: false } };
   } catch (err) {
-    if (!signal?.aborted) console.warn('[search]', query.q, err instanceof Error ? err.message : err);
+    // The query is the model's rewording of the user's question, so it isn't logged.
+    if (!signal?.aborted) console.warn('[search] a query failed:', describeError(err));
     return {
       hits: [],
       stat: { query, hits: 0, ms: Date.now() - t0, cached: false, error: err instanceof Error ? err.message : String(err) },
