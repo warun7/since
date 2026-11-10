@@ -15,6 +15,7 @@ export default defineConfig({
     },
     env: {
       DEEPSEEK_API_KEY: bindings.secret(),
+      ASSETS: bindings.assets(),
     },
     observability: { enabled: true },
   },

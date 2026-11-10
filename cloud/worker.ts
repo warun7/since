@@ -10,6 +10,7 @@ import { MemoryStore } from '../src/memory/store.js';
 
 interface Env {
   DEEPSEEK_API_KEY: string;
+  ASSETS: Fetcher;
 }
 
 /** Per visitor, in any 24 hours. Visitors can always run their own copy for more. */
@@ -89,8 +90,9 @@ interface Exports {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const { pathname } = new URL(request.url);
-    // Static assets are served before the Worker runs, so only API calls get this far.
-    if (!pathname.startsWith('/api/')) return new Response('Not found', { status: 404 });
+    // On workers.dev, static assets are served before the Worker runs. Requests passed on from
+    // since.varunsg.com (cloud/pages/) arrive here directly, so the Worker serves the UI too.
+    if (!pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
     const { Visitor, Budget } = (ctx as unknown as { exports: Exports }).exports;
 
     if (request.method === 'POST' && (pathname === '/api/chat' || pathname === '/api/example-history')) {
