@@ -15,7 +15,7 @@ export const config = {
   get deepseekBaseUrl() {
     return (env('DEEPSEEK_BASE_URL') ?? 'https://api.deepseek.com').replace(/\/+$/, '');
   },
-  /** The model that talks to the user and drives search. Non-thinking mode for latency. */
+  /** The model that talks to the user and drives search; how hard it thinks is reasoningEffort. */
   get chatModel() {
     return env('CHAT_MODEL') ?? 'deepseek-flash';
   },
@@ -32,6 +32,14 @@ export const config = {
   },
   get dbPath() {
     return env('DB_PATH') ?? 'data/since.db';
+  },
+  /**
+   * Whether the chat model thinks. low (the default): the model sizes its thinking to the
+   * question. off: about 4.6 s faster to the first token at p50, but it gets multi-step maths
+   * wrong and checks fewer figures. evals/effort/ has the runs behind this default.
+   */
+  get reasoningEffort(): 'off' | 'low' {
+    return env('REASONING_EFFORT') === 'off' ? 'off' : 'low';
   },
   /** Search rounds per turn before the model must answer with what it has. */
   get maxSearchSteps() {

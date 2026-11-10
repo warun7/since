@@ -1,6 +1,6 @@
 # since: design
 
-Every example question is about time: what did I ask on 3 November, is it still right, what changed since Monday? So `since` saves each answer as a dated list of claims, and checks them against today in the user's timezone.
+Every example question is about time: what did I ask on 3 November, is it still right, what changed since Monday? `since` saves each answer as a dated list of claims and checks them against today in the user's timezone.
 
 ## How a turn works
 
@@ -10,39 +10,42 @@ message ─► recall: resolve the dates, look them up in SQLite (~5 ms, no LLM)
         ─► DeepSeek (streamed) ─┬─► answer with [n] citations
                                 └─► web_search(queries[]) ─► DeepSeek Search, in parallel
                                     ─► merge, rank, keep the best passages ─► model again (≤ 3 rounds)
-then, in the background: save title, summary and claims · optional upheld check
+then: grounding check (or upheld) on the citations · in the background: save title, summary and claims
 ```
 
-1. **Memory is context, not a tool.** The model's only tool is `web_search`. Before it runs, code turns "last Tuesday" or "3 November" into a date range in the user's timezone and loads those conversations from SQLite, plus keyword matches. A phrase that could mean two dates tries both. The model can't skip recall, recall costs no extra call, and the model never does date maths.
-2. **Answers are saved as claims.** After each answer, a background call saves its checkable claims (`Neon · Launch price: $0.106/CU-hour · source · as of 3 Nov`). "Has pricing changed?" becomes a comparison of saved values with today's. Pricing pages change without a new date, so the prompt asks for the vendor's page (`site`) as well as news since the date (`after`).
-3. **Search that reads the page.** One call runs up to 8 queries in parallel. Results are merged (reciprocal rank fusion plus DeepSeek's relevance scores), deduplicated and capped per site, and every query keeps its best result so one vendor can't crowd out the rest. Pages are cut to the passages that match the query (about 1,400 characters); thin official pages are fetched in full.
-4. **Citations you can check.** `[n]` numbers stay fixed across a conversation, and numbers the model wasn't shown are removed. With `UPHELD_URL` set, [upheld](https://github.com/warun7/upheld), my citation checker, tests each cited claim against the passages the model saw, after the answer has streamed.
-5. **Fast by design.** There is no planner call. The system prompt never changes and comes first, so DeepSeek's prompt cache covers everything but the new message. The model is `deepseek-flash` with thinking off. Follow-ups start in under 1 s; a fresh fact takes 3–4 s; re-checking five CRMs, 7–10 s.
+1. **Memory is context, not a tool.** The model's only tool is `web_search`. Before it runs, code resolves "last Tuesday" or "3 November" to a date range in the user's timezone and loads those conversations plus keyword matches; an ambiguous phrase tries both dates. No extra call, and the model never does date maths.
 
-The prompt also enforces honesty: never invent a past conversation, say first when a date has no record, and count only things dated after "since <date>".
+2. **Answers are saved as claims.** A background call after each answer saves its checkable claims (`Neon · Launch price: $0.106/CU-hour · source · as of 3 Nov`), so "has pricing changed?" is a comparison of saved values with today's. Pricing pages change without a new date, so the prompt asks for the vendor's page (`site`) and for news since the date (`after`).
 
-**Hosted the same way.** Memory sits behind a small synchronous `Sql` interface. Locally it's a SQLite file; on Cloudflare each visitor gets a Durable Object with its own built-in SQLite. The store, schema and API are the same code, and visitors never see each other's history. A Worker in front sets the visitor cookie and rate-limits each network; questions are counted per visitor, per network and site-wide, and only once they've passed every check. Memory notes finish inside the visitor's Durable Object, which outlives the response. upheld stays local: it needs its own models.
+3. **Search that reads the page.** One call runs up to 8 queries in parallel; results are merged (reciprocal rank fusion plus DeepSeek's scores), deduplicated, capped per site, and each query keeps its best result so one vendor can't crowd out the rest. Pages are cut to the matching passages (about 1,400 characters), and thin official pages are fetched in full.
+
+4. **Citations you can check.** `[n]` numbers stay fixed across a conversation, and numbers the model wasn't shown are removed. Every answer gets a grounding check: each figure in a cited claim must appear in the passages of the source it cites. No model, milliseconds, so it runs on the hosted demo too; it can't catch a misread figure that is on the page. With `UPHELD_URL` set, [upheld](https://github.com/warun7/upheld) replaces it with a model-based check.
+
+5. **The model sizes its own thinking.** No planner, no router. At low effort it decides from what the question means, not how it is worded: roughly 100 reasoning tokens for an easy question, 2,000 for capacity maths. A search question shows `Thinking…` at 1 s, searches at 2 s, and streams its answer at 5–10 s; an easy one answers in about a second. The system prompt is static and first, so DeepSeek's prompt cache covers everything but the new message.
+
+The prompt also enforces honesty: never invent a past conversation, say first when a date has no record, count only things dated after "since <date>".
+
+**Hosted the same way.** A synchronous `Sql` interface: SQLite locally, a Durable Object per visitor on Cloudflare. Shared store, schema and API; a Worker in front sets the cookie and meters questions per visitor, per network and site-wide. upheld stays local: it needs its own models.
 
 ## Considered and rejected
 
-- **A recall tool.** An extra round trip, and the model can forget to call it. Dates can be resolved in code.
-- **A planner call.** It adds 1–2 s to every message.
-- **mem0 or Supermemory.** Both keep facts about the user and return the latest version. These questions need the exact words of a past answer, found by date. They also add a second API key and a network call per message (as would embeddings: DeepSeek has none). They would suit a user profile (below).
-- **Thinking mode.** Seconds slower to the first token. Resolved dates and saved claims do that work up front.
+- **A recall tool.** An extra round trip, and the model can forget to call it. Dates resolve in code.
+- **A planner call.** 1–2 s on every message, and the first `web_search` call already is one.
+- **mem0 or Supermemory.** They return the latest version of a fact about the user; these questions need the exact words of a past answer, found by date. Each adds a key and a network call per message, as would embeddings: DeepSeek has none.
+- **Thinking off, or effort per question.** Off is 4.6 s faster to the first token (p50) but gets multi-step maths wrong in both eval runs (`evals/effort/`). At low nothing failed for lack of thinking, so a router or `high` would only add latency.
 - **upheld before showing the answer.** 0.3–3 s per claim, so it runs after the answer, and in evals.
-- **A fetch tool, an agent framework, Next.js.** The brief allows one tool, so page reading is part of search. The agent loop is about 250 lines, so parallelism, prompt order and streaming stay under my control. The UI is one JS file, no build step.
+- **A fetch tool or a framework.** The brief allows one tool, so page reading is part of search; one ~300-line agent loop keeps parallelism, prompt order and streaming ours, and the UI is one JS file with no build step.
 
 ## Evaluation
 
-`npm test`: 85 offline unit tests (dates across timezones, recall, ranking, passages, citations, API limits). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 100% judge score, 3.4 s average to the first token, 4.8 s in total.
+`npm test`: 105 offline unit tests. `npm run eval`: 15 scenarios with a fixed clock and fixture history — the brief's questions reworded, reasoning with no search, comparisons — judged against a rubric plus checks on search use, grounding and upheld's support. Two runs at each effort (`evals/effort/`): at low, 30/30 behaviour checks and 98% judge; off, 93%, the misses being wrong answers. The judge is DeepSeek judging DeepSeek, the harness's weakest part; a cross-family judge is the next step. The rewording found a real gap: "on the 3rd" didn't resolve to a date. It does now.
 
-upheld caught what reading the answers didn't: in then/now tables, one citation covered a whole row, so old values were cited to today's page. Citing each cell separately took supported citations from 8 of 35 to 17 of 28 across the seven scenarios. Most of the 11 still flagged are real errors of that kind; the rest are judge false alarms (about 1 good citation in 5).
+upheld caught what reading the answers didn't: in then/now tables one citation covered a row, so old values were cited to today's page. Citing each cell separately took supported citations from 8 of 35 to 17 of 28 (`evals/last-run/`). The grounding check is cruder but always on: upheld agreed with all 5 of its flags, and with one figure per claim made wrong it caught 110 of 122.
 
 ## With another week
 
-- **A user profile:** keep facts the user states ("20 people", "on AWS") and include them in every message.
+- **A user profile:** keep the facts the user states ("20 people", "on AWS") in every message.
 - **Watch for changes:** re-check saved claims on a schedule, and open the next chat with what changed.
-- **Tighter diffs:** require each "now" value to be quoted from a passage.
-- **Fix before showing:** re-search flagged claims, once a faster checker fits the time budget.
-- **Sign-in,** so memory follows a person across devices; the demo keys it to a cookie holding a random id, so whoever has the cookie has the memory.
+- **Fix before showing:** the grounding check is milliseconds, so a flagged claim could go back for one more search first.
+- **Sign-in,** so memory follows a person across devices; the demo keys it to a random-id cookie.
 - Price extraction from pricing tables, better retrieval for long histories, a bigger hand-labelled eval set.

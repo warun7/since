@@ -6,7 +6,7 @@ Ask it "Last Tuesday I asked you about Postgres hosting. Has any pricing changed
 
 **Try it, no key needed:** https://since.varunsg.com. Each visitor gets their own memory. To try the memory questions, click **Add example history** first.
 
-How it's built, and why: [DESIGN.md](DESIGN.md). Last eval run: 7/7 behaviour checks, 3.4 s on average to the first token, 4.8 s in total.
+How it's built, and why: [DESIGN.md](DESIGN.md). Eval runs, and the thinking-effort ablation behind the default: [evals/effort](evals/effort/README.md).
 
 ## Run it
 
@@ -42,8 +42,11 @@ Then ask, for example:
 npm run chat        # the same agent in the terminal
 npm test            # unit tests: date resolution, recall, ranking, passages, citations (no network)
 npm run eval        # scenario evals with an LLM judge; add -- --only crm-shortlist,no-record
+npx tsx evals/compare.ts evals/effort/*/   # eval runs side by side, pooled by thinking effort
 npm run typecheck
 ```
+
+The model thinks at low effort, which it scales to the question. `REASONING_EFFORT=off` is about 4.6 s faster to the first token (p50) but gets multi-step maths wrong; [evals/effort](evals/effort/README.md) has the runs.
 
 ## Hosting
 
@@ -63,8 +66,12 @@ npx cf deploy --secrets-file ../.env   # uploads the keys in .env as Worker secr
 
 Set `CANONICAL_ORIGIN` in `cloud/cloudflare.config.ts` to your own address, or remove it to serve from workers.dev. `npx cf dev` in `cloud/` runs the Worker locally (put the key in `cloud/.dev.vars`).
 
-## Optional: citation checks with upheld
+## Citation checks
 
-[upheld](https://github.com/warun7/upheld) checks whether each cited sentence is backed by the source it cites. Run `UPHELD_MAX_CONCURRENT=1 upheld serve` (one audit at a time, since the local judge model can't run two at once) and set `UPHELD_URL=http://127.0.0.1:8000` in `.env`. After each answer has streamed, its citations are checked against the exact passages the model was shown, and the result appears under the answer. `npm run eval` also reports the support rate per scenario.
+Every cited answer gets a **grounding check**, the hosted demo included. Each figure in a cited claim (a price, a limit, a percentage, a version) is looked for in the passages of the source it cites, and the badge under the answer says how many claims had every figure on the page. It needs no model and takes a few milliseconds. It catches a figure that isn't in the source, such as a stale price, a made-up number or a computed total. It can't catch a misreading of a figure that is on the page, such as another plan's price; that needs a model.
 
-It's off in the hosted demo: upheld runs its checking models on your machine (about 4 GB, plus 8.7 GB for the judge model), and the demo has no model server behind it.
+For that deeper check, run [upheld](https://github.com/warun7/upheld), my citation checker, and it replaces the grounding check. Run `UPHELD_MAX_CONCURRENT=1 upheld serve` (one audit at a time, since the local judge model can't run two at once) and set `UPHELD_URL=http://127.0.0.1:8000` in `.env`. After each answer has streamed, upheld checks every cited sentence against the exact passages the model was shown. `npm run eval` reports both checks per scenario; the last run is in [evals/last-run](evals/last-run/README.md).
+
+upheld's reports on the three demo questions, from that run: [last Tuesday's Postgres pricing](https://upheld.varunsg.com/examples/since/last-tuesday-postgres), [what I asked on 3 November](https://upheld.varunsg.com/examples/since/recall-by-date) and [the latest Node.js release](https://upheld.varunsg.com/examples/since/fresh-fact).
+
+upheld is off in the hosted demo: it runs its checking models on your machine (about 4 GB, plus 8.7 GB for the judge model), and the demo has no model server behind it.

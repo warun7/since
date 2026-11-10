@@ -78,6 +78,20 @@ describe('resolveTimeRefs', () => {
     expect(ref.start).toBe('2026-11-08T08:00:00.000Z');
   });
 
+  it('resolves a day of the month on its own to the most recent such day', () => {
+    expect(resolveTimeRefs('Remind me what we went over on the 3rd, and does it still hold?', tuesday).map((r) => r.label)).toEqual(['Tue 3 Nov 2026']);
+    // The 20th hasn't come this month, so it is last month's.
+    expect(resolveTimeRefs('since the 20th', tuesday).map((r) => r.label)).toEqual(['Tue 20 Oct 2026']);
+    // On 10 Oct, the 31st hasn't come and September has none, so "the 31st" is 31 Aug.
+    const oct: Clock = { now: new Date('2026-10-10T12:00:00Z'), tz: 'Europe/London' };
+    expect(resolveTimeRefs('on the 31st', oct).map((r) => r.label)).toEqual(['Mon 31 Aug 2026']);
+  });
+
+  it('leaves "the 3rd of November" to the day-month rule and "the 3rd option" alone', () => {
+    expect(resolveTimeRefs('on the 3rd of November', tuesday).map((r) => r.label)).toEqual(['Tue 3 Nov 2026']);
+    expect(resolveTimeRefs('I went with the one on the 3rd option', tuesday)).toEqual([]);
+  });
+
   it('returns nothing for a message with no time reference', () => {
     expect(resolveTimeRefs("What's the weather like?", tuesday)).toEqual([]);
   });

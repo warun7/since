@@ -165,9 +165,25 @@ export interface RecallResult {
 
 export interface TurnTrace {
   model: string;
+  /** REASONING_EFFORT for this turn. */
+  effort?: 'off' | 'low';
   steps: Array<{ queries: SearchQuery[]; ms: number; sources: number }>;
-  timings: { recallMs: number; firstTokenMs: number | null; searchMs: number; totalMs: number };
-  usage: { promptTokens: number; completionTokens: number; cachedTokens: number };
+  /** Model steps that searched; more than one means it searched again for a gap. */
+  searchRounds?: number;
+  /**
+   * firstActivityMs is when the user first saw something ("Thinking…" or the first token);
+   * firstTokenMs is when the answer itself started. At low effort the gap is the thinking.
+   */
+  timings: {
+    recallMs: number;
+    firstActivityMs?: number | null;
+    firstTokenMs: number | null;
+    searchMs: number;
+    thinkingMs?: number;
+    totalMs: number;
+  };
+  /** completionTokens includes reasoningTokens. */
+  usage: { promptTokens: number; completionTokens: number; cachedTokens: number; reasoningTokens?: number };
   recall: { hits: number; refs: string[]; emptyRefs: string[] };
 }
 

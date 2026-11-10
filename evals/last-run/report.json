@@ -1,0 +1,1301 @@
+{
+  "runId": "2026-11-10T20-09-20",
+  "model": "deepseek-flash",
+  "upheld": true,
+  "summary": {
+    "scenarios": 7,
+    "avgJudgePassRate": 0.9714285714285714,
+    "expectPassed": 7,
+    "avgFirstTokenMs": 2232.285714285714,
+    "avgTotalMs": 3512.714285714286,
+    "grounding": {
+      "grounded": 18,
+      "cited": 23,
+      "plantedCaught": 27,
+      "plantedTried": 29,
+      "plantedPricesCaught": 20,
+      "plantedPricesTried": 21
+    },
+    "upheld": {
+      "supported": 15,
+      "cited": 27
+    }
+  },
+  "scenarios": [
+    {
+      "id": "recall-by-date",
+      "description": "Recall an earlier question by its date, then re-check its claims against current sources.",
+      "now": "2026-11-10T15:00:00Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "What did I ask you on 3 November? Is your answer still correct today?",
+          "answer": "I couldn't fully re-verify every figure — the pricing pages themselves didn't return clean numbers this time, so some items are only partly confirmed.\n\n**What you asked on Tue 3 Nov 2026:** \"What are the cheapest managed Postgres hosting options right now for a small production app? Compare the entry paid plans.\" I answered with Neon Launch (~$19/mo), Supabase Pro ($25/mo), Render Basic-256mb (~$6/mo) and AWS RDS db.t4g.micro (~$12/mo), and said Render was the cheapest entry point.\n\n| Item | Then (3 Nov 2026) | Now (10 Nov 2026) | Status |\n|---|---|---|---|\n| Neon Launch | $19/mo | Launch compute still billed per CU-hour at $0.106/CU-hour, ~1 vCPU + 4 GB [3]; the $19 base plan price wasn't confirmed | Couldn't verify |\n| Supabase Pro | $25/mo | $25/mo per project, includes $10/mo compute credits covering one Micro instance [2] | Unchanged |\n| Render Basic-256mb | ~$6/mo | Not confirmed; Render's own pages point to its pricing page for current plans [1] | Couldn't verify |\n| AWS RDS db.t4g.micro | ~$12/mo single-AZ | Not confirmed; only the free-tier terms (750 hrs/mo for 12 months) came back [10] | Couldn't verify |\n\nOne caveat worth keeping: Supabase's $25 covers the plan plus one Micro instance via credits, but each extra project adds ~$10/mo compute [2][6], so a multi-project setup costs more than the headline figure.",
+          "conversationId": "a34c15bb-9b09-437b-8f4f-691645c58e62",
+          "queries": [
+            [
+              {
+                "q": "pricing plans",
+                "site": "neon.tech"
+              },
+              {
+                "q": "pricing plans",
+                "site": "supabase.com"
+              },
+              {
+                "q": "pricing postgres",
+                "site": "render.com"
+              },
+              {
+                "q": "db.t4g.micro price per hour",
+                "site": "aws.amazon.com"
+              }
+            ]
+          ],
+          "sources": [
+            {
+              "n": 3,
+              "url": "https://render.com/articles/managed-postgresql-pricing-2026.md",
+              "title": "render.com",
+              "site": "render.com",
+              "published": "2026-10-27"
+            },
+            {
+              "n": 2,
+              "url": "https://supabase.com/pricing.md",
+              "title": "Supabase Pricing",
+              "site": "supabase.com"
+            },
+            {
+              "n": 1,
+              "url": "https://render.com/articles/render-postgres-vs-neon.md",
+              "title": "Render Postgres vs Neon - Render Postgres vs Neon",
+              "site": "render.com",
+              "published": "2026-10-14"
+            },
+            {
+              "n": 10,
+              "url": "https://aws.amazon.com/ar/rds/free/?loc=ft#1",
+              "title": "Amazon RDS Free Tier | Cloud Relational Database | Amazon Web Services - As part of the AWS Free Tier, the Amazon RDS Free Tier helps new AWS customers get started with a managed database service in th...",
+              "site": "aws.amazon.com",
+              "published": "2022-07-30"
+            },
+            {
+              "n": 6,
+              "url": "https://supabase.com/docs/guides/platform/compute-and-disk#1",
+              "title": "Compute and Disk | Supabase Docs - Updated",
+              "site": "supabase.com",
+              "published": "2026-11-01"
+            }
+          ],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [
+              {
+                "queries": [
+                  {
+                    "q": "pricing plans",
+                    "site": "neon.tech"
+                  },
+                  {
+                    "q": "pricing plans",
+                    "site": "supabase.com"
+                  },
+                  {
+                    "q": "pricing postgres",
+                    "site": "render.com"
+                  },
+                  {
+                    "q": "db.t4g.micro price per hour",
+                    "site": "aws.amazon.com"
+                  }
+                ],
+                "ms": 626,
+                "sources": 12
+              }
+            ],
+            "timings": {
+              "recallMs": 13,
+              "firstTokenMs": 2550,
+              "searchMs": 627,
+              "totalMs": 4291
+            },
+            "usage": {
+              "promptTokens": 9013,
+              "completionTokens": 488,
+              "cachedTokens": 4352
+            },
+            "recall": {
+              "hits": 1,
+              "refs": [
+                "on 3 November = Tue 3 Nov 2026"
+              ],
+              "emptyRefs": []
+            }
+          },
+          "errors": [],
+          "wallMs": 8714
+        }
+      ],
+      "searchSteps": 1,
+      "expect": {
+        "ok": true,
+        "detail": "no search constraint"
+      },
+      "criteria": [
+        {
+          "criterion": "Restates the 3 November question accurately (managed Postgres hosting for a small production app, entry paid plans).",
+          "pass": true,
+          "reason": "It quotes the original question verbatim, including managed Postgres for a small production app and entry paid plans."
+        },
+        {
+          "criterion": "Re-checks the earlier claims against current sources rather than simply repeating the old answer.",
+          "pass": true,
+          "reason": "It reports running searches and gives a Then/Now comparison with verification status per provider."
+        },
+        {
+          "criterion": "For each provider (Neon, Supabase, Render, AWS RDS), says whether its price still holds, changed (old -> new), or could not be verified.",
+          "pass": true,
+          "reason": "Each of the four providers has a status: Supabase unchanged, the other three couldn't verify."
+        },
+        {
+          "criterion": "Cites sources with [n] markers.",
+          "pass": true,
+          "reason": "The answer includes bracketed markers such as [1], [2], [3], [6], [10]."
+        },
+        {
+          "criterion": "Uses absolute dates (for example 3 November 2026), not only \"last week\" or \"today\".",
+          "pass": true,
+          "reason": "It uses absolute dates like 3 Nov 2026 and 10 Nov 2026."
+        }
+      ],
+      "judgePassRate": 1,
+      "grounding": {
+        "status": "ok",
+        "supported": 2,
+        "cited": 5,
+        "flagged": [
+          {
+            "claim": "Neon Launch: Launch compute still billed per CU-hour at $0.106/CU-hour, ~1 vCPU + 4 GB [3]; the $19 base plan price wasn't confirmed.",
+            "verdict": "number not in source",
+            "source": "3",
+            "note": "Not in the cited text: $19"
+          },
+          {
+            "claim": "Render Basic-256mb: Not confirmed; Render's own pages point to its pricing page for current plans [1].",
+            "verdict": "number not in source",
+            "source": "1",
+            "note": "Not in the cited text: 256"
+          },
+          {
+            "claim": "AWS RDS db.t4g.micro: Not confirmed; only the free-tier terms (750 hrs/mo for 12 months) came back [10].",
+            "verdict": "number not in source",
+            "source": "10",
+            "note": "Not in the cited text: 12"
+          }
+        ],
+        "verifier": "grounding",
+        "ms": 3
+      },
+      "groundingProbe": {
+        "tried": 4,
+        "caught": 4,
+        "pricesTried": 4,
+        "pricesCaught": 4,
+        "missed": []
+      },
+      "upheld": {
+        "status": "ok",
+        "supported": 2,
+        "cited": 5,
+        "flagged": [
+          {
+            "claim": "Neon Launch: Launch compute still billed per CU-hour at $0.106/CU-hour, ~1 vCPU + 4 GB; the $19 base plan price wasn't confirmed.",
+            "verdict": "unsupported",
+            "source": "3"
+          },
+          {
+            "claim": "Render Basic-256mb: Not confirmed; Render's own pages point to its pricing page for current plans.",
+            "verdict": "unsupported",
+            "source": "1"
+          },
+          {
+            "claim": "AWS RDS db.t4g.micro: Not confirmed; only the free-tier terms (750 hrs/mo for 12 months) came back.",
+            "verdict": "wrong_entity",
+            "source": "10"
+          }
+        ],
+        "verifier": "judge:granite-guardian-3.3-8b@0.06",
+        "ms": 3776
+      }
+    },
+    {
+      "id": "no-record",
+      "description": "No memory of the referenced date: must say so instead of inventing a conversation.",
+      "now": "2026-11-10T15:00:00Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "What did I ask you on 3 November?",
+          "answer": "I don't have a conversation from Tue 3 Nov 2026 — there's no record of any exchange with you on that date, and in fact no earlier conversations between us at all. The nearest dates I have anything for are none; today, Tue 10 Nov 2026, is our first.\n\nIf you were thinking of a different date, or a different assistant or app, tell me roughly what the question was about and I can look into it now.",
+          "conversationId": "f06e5715-a999-417c-8642-8cdce1aa1adf",
+          "queries": [],
+          "sources": [],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [],
+            "timings": {
+              "recallMs": 15,
+              "firstTokenMs": 1017,
+              "searchMs": 0,
+              "totalMs": 1655
+            },
+            "usage": {
+              "promptTokens": 1744,
+              "completionTokens": 95,
+              "cachedTokens": 1536
+            },
+            "recall": {
+              "hits": 0,
+              "refs": [
+                "on 3 November = Tue 3 Nov 2026"
+              ],
+              "emptyRefs": [
+                "Tue 3 Nov 2026"
+              ]
+            }
+          },
+          "errors": [],
+          "wallMs": 1657
+        }
+      ],
+      "searchSteps": 0,
+      "expect": {
+        "ok": true,
+        "detail": "searches 0 (max 0)"
+      },
+      "criteria": [
+        {
+          "criterion": "Says plainly that it has no record of a conversation on 3 November 2026.",
+          "pass": true,
+          "reason": "It states there is no record of any exchange on Tue 3 Nov 2026."
+        },
+        {
+          "criterion": "Does not invent a past question or answer.",
+          "pass": true,
+          "reason": "It explicitly says no earlier conversations exist and invents nothing."
+        },
+        {
+          "criterion": "Offers a useful next step (for example, asking the question again, or describing what they remember).",
+          "pass": true,
+          "reason": "It asks the user to say roughly what the question was about so it can look into it."
+        },
+        {
+          "criterion": "Is short: no more than about four sentences.",
+          "pass": true,
+          "reason": "The answer is three sentences long."
+        }
+      ],
+      "judgePassRate": 1,
+      "grounding": null,
+      "groundingProbe": null,
+      "upheld": null
+    },
+    {
+      "id": "last-tuesday-postgres",
+      "description": "Resolve \"last Tuesday\" to a date, then compare the old Postgres prices with current ones.",
+      "now": "2026-11-10T15:00:00Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "Last Tuesday I asked you about Postgres hosting. Has any pricing changed since then?",
+          "answer": "Two of the four changed: Neon's Launch plan no longer has a $19/month price, and Render's smallest Postgres is now $10/month rather than $6.\n\n| Item | Then (3 Nov 2026) | Now (10 Nov 2026) | Status |\n|---|---|---|---|\n| Neon · Launch plan | $19/month | Usage-based: $0.106 per CU-hour, no monthly minimum [6] | Changed |\n| Supabase · Pro | $25/month | $25/month, includes $10 compute credit covering one Micro instance [1][4] | Unchanged |\n| Render · smallest Postgres | Basic-256mb, $6/month | 256 MB RAM / 256 MB storage tier at $10/month [8] | Changed |\n| AWS RDS · db.t4g.micro single-AZ | ~$12/month | Couldn't verify — the pricing page I found didn't show the per-hour rate [14] | Unverified |\n\nOn Neon: the usage-based model itself dates from August 2025, but the current plans documentation (updated 7 Nov 2026) confirms Launch compute at $0.106/CU-hour with no monthly minimum [6]. So the $19 figure I gave you was already wrong on 3 Nov — a Launch compute instance running continuously costs roughly $77/month at that rate, and a light workload costs far less. That's a correction to my earlier answer, not a change since then.\n\nOn Render: the $10/month tier is the current flexible compute plan; the $7/month \"Starter\" type is legacy and not available for new databases [10]. My $6 figure doesn't match either, so treat that as an error too.\n\nSupabase is the one that held up exactly as stated.",
+          "conversationId": "9a2082dd-0476-411e-8ed9-6646c7a64d61",
+          "queries": [
+            [
+              {
+                "q": "Neon pricing plans Launch plan price",
+                "site": "neon.tech"
+              },
+              {
+                "q": "Supabase pricing Pro plan price per month",
+                "site": "supabase.com"
+              },
+              {
+                "q": "Render pricing Postgres Basic-256mb",
+                "site": "render.com"
+              },
+              {
+                "q": "Amazon RDS for PostgreSQL pricing db.t4g.micro",
+                "site": "aws.amazon.com"
+              },
+              {
+                "q": "Neon pricing change announcement",
+                "after": "2026-11-03"
+              },
+              {
+                "q": "Supabase pricing change announcement",
+                "after": "2026-11-03"
+              },
+              {
+                "q": "Render pricing change Postgres",
+                "after": "2026-11-03"
+              }
+            ]
+          ],
+          "sources": [
+            {
+              "n": 6,
+              "url": "https://github.com/neondatabase/website/blob/6420cdb73bc86b8ab79987abf2a99f8f2aa9543b/content/blog/posts/new-usage-based-pricing.md",
+              "title": "Neon’s New Pricing, Explained: Usage-Based, No Minimum",
+              "site": "github.com",
+              "published": "2026-11-07"
+            },
+            {
+              "n": 1,
+              "url": "https://supabase.com/pricing.md#1",
+              "title": "Supabase Pricing - Supabase Pricing",
+              "site": "supabase.com"
+            },
+            {
+              "n": 4,
+              "url": "https://supabase.com/pricing#1",
+              "title": "Pricing & Fees | Supabase - Predictable pricing,",
+              "site": "supabase.com"
+            },
+            {
+              "n": 8,
+              "url": "https://render.com/pricing?trk=article-ssr-frontend-pulse_little-text-block#1",
+              "title": "Pricing",
+              "site": "render.com"
+            },
+            {
+              "n": 14,
+              "url": "https://aws.amazon.com/vi/rds/postgresql/pricing/#2",
+              "title": "Định giá - RDS Extended Support pricing example",
+              "site": "aws.amazon.com",
+              "published": "2026-04-28"
+            },
+            {
+              "n": 10,
+              "url": "https://render.com/docs/postgresql-legacy-instance-types.md",
+              "title": "render.com",
+              "site": "render.com"
+            }
+          ],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [
+              {
+                "queries": [
+                  {
+                    "q": "Neon pricing plans Launch plan price",
+                    "site": "neon.tech"
+                  },
+                  {
+                    "q": "Supabase pricing Pro plan price per month",
+                    "site": "supabase.com"
+                  },
+                  {
+                    "q": "Render pricing Postgres Basic-256mb",
+                    "site": "render.com"
+                  },
+                  {
+                    "q": "Amazon RDS for PostgreSQL pricing db.t4g.micro",
+                    "site": "aws.amazon.com"
+                  },
+                  {
+                    "q": "Neon pricing change announcement",
+                    "after": "2026-11-03"
+                  },
+                  {
+                    "q": "Supabase pricing change announcement",
+                    "after": "2026-11-03"
+                  },
+                  {
+                    "q": "Render pricing change Postgres",
+                    "after": "2026-11-03"
+                  }
+                ],
+                "ms": 712,
+                "sources": 14
+              }
+            ],
+            "timings": {
+              "recallMs": 4,
+              "firstTokenMs": 2918,
+              "searchMs": 712,
+              "totalMs": 4994
+            },
+            "usage": {
+              "promptTokens": 9714,
+              "completionTokens": 569,
+              "cachedTokens": 4352
+            },
+            "recall": {
+              "hits": 1,
+              "refs": [
+                "Last Tuesday = Tue 3 Nov 2026"
+              ],
+              "emptyRefs": []
+            }
+          },
+          "errors": [],
+          "wallMs": 10074
+        }
+      ],
+      "searchSteps": 1,
+      "expect": {
+        "ok": true,
+        "detail": "no search constraint"
+      },
+      "criteria": [
+        {
+          "criterion": "Identifies last Tuesday as 3 November 2026.",
+          "pass": true,
+          "reason": "The table header explicitly says 'Then (3 Nov 2026)', identifying last Tuesday as 3 November 2026."
+        },
+        {
+          "criterion": "Covers each provider from that answer by name (Neon, Supabase, Render, AWS RDS).",
+          "pass": true,
+          "reason": "All four providers—Neon, Supabase, Render, and AWS RDS—appear by name in the table."
+        },
+        {
+          "criterion": "For each provider, compares the earlier price to the current price (both stated).",
+          "pass": false,
+          "reason": "AWS RDS current price is not stated ('Couldn't verify'), so both prices are not given for every provider."
+        },
+        {
+          "criterion": "Cites current sources with [n] markers.",
+          "pass": true,
+          "reason": "The answer includes bracketed markers such as [6], [1][4], [8], [10], and [14]."
+        },
+        {
+          "criterion": "Gives a clear verdict up front (for example, which prices changed and which did not).",
+          "pass": true,
+          "reason": "The opening line states 'Two of the four changed' and names Neon and Render, with a Status column."
+        }
+      ],
+      "judgePassRate": 0.8,
+      "grounding": {
+        "status": "ok",
+        "supported": 4,
+        "cited": 5,
+        "flagged": [
+          {
+            "claim": "On Render: the $10/month tier is the current flexible compute plan; the $7/month \"Starter\" type is legacy and not available for new databases [10].",
+            "verdict": "number not in source",
+            "source": "10",
+            "note": "Not in the cited text: $10"
+          }
+        ],
+        "verifier": "grounding",
+        "ms": 0
+      },
+      "groundingProbe": {
+        "tried": 7,
+        "caught": 7,
+        "pricesTried": 5,
+        "pricesCaught": 5,
+        "missed": []
+      },
+      "upheld": {
+        "status": "ok",
+        "supported": 4,
+        "cited": 6,
+        "flagged": [
+          {
+            "claim": "AWS RDS · db.t4g.micro single-AZ: Couldn't verify — the pricing page I found didn't show the per-hour rate.",
+            "verdict": "unsupported",
+            "source": "14"
+          },
+          {
+            "claim": "On Render: the $10/month tier is the current flexible compute plan; the $7/month \"Starter\" type is legacy and not available for new databases.",
+            "verdict": "unsupported",
+            "source": "10"
+          }
+        ],
+        "verifier": "judge:granite-guardian-3.3-8b@0.06",
+        "ms": 5096
+      }
+    },
+    {
+      "id": "crm-shortlist",
+      "description": "Follow up a shortlist: pricing changes and notable launches since Monday 9 November.",
+      "now": "2026-11-12T10:00:00Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "On Monday we shortlisted 5 CRM tools for a 20-person sales team. Has any of them changed pricing or shipped something big since?",
+          "answer": "**No headline price changed since Monday, but two things are worth flagging: Pipedrive's Growth price looks different from what I quoted, and Close has shipped a big AI feature (Chloe) that's now on every plan.**\n\n| Item | Then (Mon 9 Nov 2026) | Now (Thu 12 Nov 2026) | Status |\n|---|---|---|---|\n| HubSpot Sales Hub Professional | $90/seat/mo | $90/seat/mo (annual), $100 monthly; $1,500 one-time onboarding [9] | Unchanged |\n| Pipedrive Growth | $49/seat/mo | $39/seat/mo billed annually; $49 monthly [13][22][26] | Unchanged for monthly billing — my figure was the monthly price, so annual is ~20% cheaper |\n| Salesforce Starter Suite | $25/user/mo | $25/user/mo starting price [3][7] | Unchanged |\n| Zoho CRM Professional | $23/user/mo | $23/user/mo (annual); $35 monthly [16][21][27] | Unchanged |\n| Close Growth | $109/seat/mo | $109/seat/mo monthly; $99 annual [1][4] | Unchanged |\n\n**What's shipped that matters:**\n- **Close:** Chloe, its AI sales agent that calls, qualifies and books meetings, is now included on every plan (free in beta) [1][6], and per the vendor comparison it has been on all plans since June 2026 [25]. That's a real differentiator for a 20-seat team, though it's still beta and AI usage is metered by credits [6].\n- **Zoho:** its 2026 \"CRM for Everyone\" restructure moved AI agents, workflow rules and forecasting down into Standard ($14), so Professional's $23 buys more than it did a year ago [15][16].\n- **HubSpot:** no Sales Hub pricing or plan change; the only current promo is a discounted Revenue Hub bundle for new customers [9].\n- **Pipedrive, Salesforce:** no pricing or major product announcements dated after 9 Nov 2026 that I could find.\n\nNothing here changes the ranking: Zoho and Salesforce Starter remain cheapest at 20 seats, and Close's Chloe rollout strengthens its case if AI-driven outbound calling is on your wishlist.",
+          "conversationId": "f5063fb6-3494-463d-9a01-34969fab3bc3",
+          "queries": [
+            [
+              {
+                "q": "Sales Hub Professional pricing per seat",
+                "site": "hubspot.com"
+              },
+              {
+                "q": "pricing plans Growth per seat",
+                "site": "pipedrive.com"
+              },
+              {
+                "q": "Salesforce Starter Suite pricing per user",
+                "site": "salesforce.com"
+              },
+              {
+                "q": "Zoho CRM pricing Professional per user",
+                "site": "zoho.com"
+              },
+              {
+                "q": "Close CRM pricing Growth plan",
+                "site": "close.com"
+              },
+              {
+                "q": "HubSpot Sales Hub pricing change announcement",
+                "after": "2026-11-09"
+              },
+              {
+                "q": "Pipedrive new feature announcement",
+                "after": "2026-11-09"
+              },
+              {
+                "q": "Zoho CRM Salesforce Close CRM announcement",
+                "after": "2026-11-09"
+              }
+            ],
+            [
+              {
+                "q": "Pipedrive Growth plan price per seat monthly 2026"
+              },
+              {
+                "q": "Zoho CRM Professional price per user month USD 2026"
+              },
+              {
+                "q": "HubSpot Sales Hub new features launch November 2026",
+                "after": "2026-11-09"
+              },
+              {
+                "q": "Salesforce Starter Suite new features announcement November 2026",
+                "after": "2026-11-09"
+              },
+              {
+                "q": "Close CRM Chloe AI sales agent launch news",
+                "after": "2026-11-01"
+              }
+            ]
+          ],
+          "sources": [
+            {
+              "n": 9,
+              "url": "https://www.hubspot.com/pricing/sales?%2525252525252525252525253Butm_content=29922790&%2525252525252525252525253Butm_medium=email&%2525252525252525252525253Butm_source=hs_email&%25252525252525252525253Butm_content=29922790&%25252525252525252525253Butm_medium=email&%25252525252525252525253Butm_source=hs_email&exp-cohort=dist-0031-control&hubs_content-cta=nav-pricing&hubs_content=www.hubspot.com/products/content&hubs_post-cta=fr-blog-image&utm_portalid=53#1",
+              "title": "Sales Hub - Manage your full revenue journey on one customer platform",
+              "site": "hubspot.com"
+            },
+            {
+              "n": 13,
+              "url": "https://www.pipedrive.com/en/pricing?external_link=true",
+              "title": "CRM Pricing Plans | Affordable CRM Software Costs",
+              "site": "pipedrive.com",
+              "published": "2024-01-28"
+            },
+            {
+              "n": 22,
+              "url": "https://zenodo.org/records/23345627#6",
+              "title": "Report 02: who do AI engines cite for software pricing? - \"position\": 10,",
+              "site": "zenodo.org",
+              "published": "2026-09-30"
+            },
+            {
+              "n": 26,
+              "url": "https://outmano.com/tools/pipedrive/pricing",
+              "title": "Pipedrive Pricing 2026: Plans & Cost | Outmano",
+              "site": "outmano.com",
+              "published": "2026-10-13"
+            },
+            {
+              "n": 3,
+              "url": "https://www.salesforce.com/ca/small-business/crm-suites/#1",
+              "title": "All-in-One CRM Suites Built for Small Business Growth",
+              "site": "salesforce.com",
+              "published": "2026-01-15"
+            },
+            {
+              "n": 7,
+              "url": "https://www.salesforce.com/crm/free-trial/?d=ob",
+              "title": "CRM Free Trial: Start Salesforce for free",
+              "site": "salesforce.com",
+              "published": "2026-05-13"
+            },
+            {
+              "n": 16,
+              "url": "https://theaiagentindex.com/agents/zoho-crm",
+              "title": "Zoho CRM Review (2026): $14/mo, Zia AI Starts at $23",
+              "site": "theaiagentindex.com",
+              "published": "2026-03-20"
+            },
+            {
+              "n": 21,
+              "url": "https://www.selecthub.com/p/crm-software/zoho-crm/?from_category=1085#1",
+              "title": "Zoho CRM Reviews 2026: Pricing, Features & More - Zoho CRM Reviews & Pricing",
+              "site": "selecthub.com"
+            },
+            {
+              "n": 27,
+              "url": "https://www.spotsaas.com/blog/zoho-crm-pricing#1",
+              "title": "Zoho CRM Pricing 2026: Editions, Bigin, Zoho One and What You’ll Pay",
+              "site": "spotsaas.com",
+              "published": "2026-09-22"
+            },
+            {
+              "n": 1,
+              "url": "https://close.com/pricing?gspk=eWV2aGVuZGVya2FjaA&gsxid=m8rmoTx69YljgW&ps_partner_key=eWV2aGVuZGVya2FjaA&ps_xid=m8rmoTx69YljgW&pscd=refer.close.com",
+              "title": "Close CRM Pricing | Plans with Calling, SMS & AI Sales Agent",
+              "site": "close.com"
+            },
+            {
+              "n": 4,
+              "url": "https://www.close.com/pt/pricing?gspk=bWljaGFlbHN0ZWRsZXI2MTk2&gsxid=nDCKa8SUCR5AO8&ps_partner_key=bWljaGFlbHN0ZWRsZXI2MTk2&ps_xid=nDCKa8SUCR5AO8&pscd=refer.close.com",
+              "title": "Close CRM Pricing | Simple Plans, No Contracts",
+              "site": "close.com"
+            },
+            {
+              "n": 6,
+              "url": "https://close.com/pricing?hubs_post-cta=author",
+              "title": "Close CRM Pricing | Plans with Calling, SMS & AI Sales Agent",
+              "site": "close.com"
+            },
+            {
+              "n": 25,
+              "url": "https://www.leadfriendly.com/vs/close",
+              "title": "Lead Friendly vs Close",
+              "site": "leadfriendly.com",
+              "published": "2026-11-01"
+            },
+            {
+              "n": 15,
+              "url": "https://www.elsner.com/zoho-crm-pricing-plans-guide/#are-there-hidden-costs-beyond-the-zoho-crm-subscription",
+              "title": "Zoho CRM Pricing 2026: Plans, Costs & Hidden Fees",
+              "site": "elsner.com",
+              "published": "2026-04-13"
+            }
+          ],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [
+              {
+                "queries": [
+                  {
+                    "q": "Sales Hub Professional pricing per seat",
+                    "site": "hubspot.com"
+                  },
+                  {
+                    "q": "pricing plans Growth per seat",
+                    "site": "pipedrive.com"
+                  },
+                  {
+                    "q": "Salesforce Starter Suite pricing per user",
+                    "site": "salesforce.com"
+                  },
+                  {
+                    "q": "Zoho CRM pricing Professional per user",
+                    "site": "zoho.com"
+                  },
+                  {
+                    "q": "Close CRM pricing Growth plan",
+                    "site": "close.com"
+                  },
+                  {
+                    "q": "HubSpot Sales Hub pricing change announcement",
+                    "after": "2026-11-09"
+                  },
+                  {
+                    "q": "Pipedrive new feature announcement",
+                    "after": "2026-11-09"
+                  },
+                  {
+                    "q": "Zoho CRM Salesforce Close CRM announcement",
+                    "after": "2026-11-09"
+                  }
+                ],
+                "ms": 590,
+                "sources": 14
+              },
+              {
+                "queries": [
+                  {
+                    "q": "Pipedrive Growth plan price per seat monthly 2026"
+                  },
+                  {
+                    "q": "Zoho CRM Professional price per user month USD 2026"
+                  },
+                  {
+                    "q": "HubSpot Sales Hub new features launch November 2026",
+                    "after": "2026-11-09"
+                  },
+                  {
+                    "q": "Salesforce Starter Suite new features announcement November 2026",
+                    "after": "2026-11-09"
+                  },
+                  {
+                    "q": "Close CRM Chloe AI sales agent launch news",
+                    "after": "2026-11-01"
+                  }
+                ],
+                "ms": 624,
+                "sources": 14
+              }
+            ],
+            "timings": {
+              "recallMs": 2,
+              "firstTokenMs": 5443,
+              "searchMs": 1214,
+              "totalMs": 8273
+            },
+            "usage": {
+              "promptTokens": 23302,
+              "completionTokens": 867,
+              "cachedTokens": 12416
+            },
+            "recall": {
+              "hits": 1,
+              "refs": [
+                "On Monday = Mon 9 Nov 2026"
+              ],
+              "emptyRefs": []
+            }
+          },
+          "errors": [],
+          "wallMs": 25495
+        }
+      ],
+      "searchSteps": 2,
+      "expect": {
+        "ok": true,
+        "detail": "no search constraint"
+      },
+      "criteria": [
+        {
+          "criterion": "Names all five tools from the shortlist (HubSpot Sales Hub, Pipedrive, Salesforce Starter Suite, Zoho CRM, Close).",
+          "pass": true,
+          "reason": "The table lists all five: HubSpot Sales Hub Professional, Pipedrive Growth, Salesforce Starter Suite, Zoho CRM Professional, and Close Growth."
+        },
+        {
+          "criterion": "For each tool, says whether its pricing changed since 9 November 2026 and whether anything notable shipped since then.",
+          "pass": true,
+          "reason": "Each row gives a Then/Now price and status, and the shipped section covers Close, Zoho, HubSpot, Pipedrive and Salesforce."
+        },
+        {
+          "criterion": "Its searches are restricted to recent news or official pages (queries use an after date or a site restriction).",
+          "pass": true,
+          "reason": "Queries use site: restrictions and after:2026-11-09/2026-11-01 date filters."
+        },
+        {
+          "criterion": "Cites sources with [n] markers.",
+          "pass": true,
+          "reason": "The answer includes bracketed numeric citations such as [9], [13], [1][6]."
+        },
+        {
+          "criterion": "Is scannable: a table or one line per tool.",
+          "pass": true,
+          "reason": "A per-tool table plus a bulleted shipped section makes it scannable."
+        }
+      ],
+      "judgePassRate": 1,
+      "grounding": {
+        "status": "ok",
+        "supported": 6,
+        "cited": 6,
+        "flagged": [],
+        "verifier": "grounding",
+        "ms": 1
+      },
+      "groundingProbe": {
+        "tried": 12,
+        "caught": 11,
+        "pricesTried": 12,
+        "pricesCaught": 11,
+        "missed": [
+          "$49 -> $59"
+        ]
+      },
+      "upheld": {
+        "status": "ok",
+        "supported": 7,
+        "cited": 9,
+        "flagged": [
+          {
+            "claim": "Close Growth: $109/seat/mo monthly; $99 annual.",
+            "verdict": "unsupported",
+            "source": "1"
+          },
+          {
+            "claim": "That's a real differentiator for a 20-seat team, though it's still beta and AI usage is metered by credits.",
+            "verdict": "unsupported",
+            "source": "6"
+          }
+        ],
+        "verifier": "judge:granite-guardian-3.3-8b@0.06",
+        "ms": 17477
+      }
+    },
+    {
+      "id": "fresh-fact",
+      "description": "A time-sensitive fact with no history: must search, answer specifically and date it.",
+      "now": "2026-11-10T20:09:20.950Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "What's the latest stable version of Node.js?",
+          "answer": "**Node.js 26.13.0 \"Lithium\" is the latest stable release**, published 28 Oct 2026 [1][5].\n\nIt's also the current Active LTS: Node 26 moved into Long Term Support on 28 Oct 2026 and will be supported until the end of April 2029 [1]. The release itself was purely a metadata change from 26.12.1, which was a security release on 21 Oct 2026 [1][5].\n\nA couple of things worth knowing:\n- Node 24 (24.22.2) is now in maintenance, and Node 22 is still receiving security updates [2][8].\n- Under the release-schedule change announced in March 2026, Node 26 is the last line on the old model; from Node 27 onward there's one major release per year (April) with LTS promotion in October, and every release becomes LTS [3][7]. Node 27 is currently in alpha, with 27.0.0 due 22 Apr 2027 [7].",
+          "conversationId": "439261a0-954f-4ae5-b512-2bb2600647ae",
+          "queries": [
+            [
+              {
+                "q": "Node.js latest stable version release November 2026"
+              },
+              {
+                "q": "Node.js release schedule current LTS version 2026",
+                "site": "nodejs.org"
+              }
+            ]
+          ],
+          "sources": [
+            {
+              "n": 1,
+              "url": "https://nodejs.org/es/blog/release/v26.13.0",
+              "title": "Node.js — Node.js 26.13.0 (LTS)",
+              "site": "nodejs.org",
+              "published": "2026-10-27"
+            },
+            {
+              "n": 5,
+              "url": "https://github.com/jdx/mise/pull/15355",
+              "title": "chore(deps): update node.js to v26 by renovate[bot] · Pull Request #15355 · jdx/mise",
+              "site": "github.com",
+              "published": "2026-11-03"
+            },
+            {
+              "n": 2,
+              "url": "https://github.com/wrongstack/wrongstack/blob/accacc15bb818b69aeac382d550a6d0b52e78ec3/packages/core/skills/node-modern/SKILL.md",
+              "title": "Modern Node.js",
+              "site": "github.com",
+              "published": "2026-11-08"
+            },
+            {
+              "n": 8,
+              "url": "https://security.snyk.io/package/npm/node-win-arm64/versions?page=",
+              "title": "node-win-arm64 package versions | Snyk",
+              "site": "security.snyk.io"
+            },
+            {
+              "n": 3,
+              "url": "https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule",
+              "title": "Node.js — Evolving the Node.js Release Schedule",
+              "site": "nodejs.org",
+              "published": "2026-03-09"
+            },
+            {
+              "n": 7,
+              "url": "https://raw.githubusercontent.com/nodejs/Release/refs/heads/main/README.md#1",
+              "title": "raw.githubusercontent.com",
+              "site": "raw.githubusercontent.com"
+            }
+          ],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [
+              {
+                "queries": [
+                  {
+                    "q": "Node.js latest stable version release November 2026"
+                  },
+                  {
+                    "q": "Node.js release schedule current LTS version 2026",
+                    "site": "nodejs.org"
+                  }
+                ],
+                "ms": 536,
+                "sources": 8
+              }
+            ],
+            "timings": {
+              "recallMs": 2,
+              "firstTokenMs": 2163,
+              "searchMs": 536,
+              "totalMs": 3275
+            },
+            "usage": {
+              "promptTokens": 6550,
+              "completionTokens": 302,
+              "cachedTokens": 2944
+            },
+            "recall": {
+              "hits": 0,
+              "refs": [],
+              "emptyRefs": []
+            }
+          },
+          "errors": [],
+          "wallMs": 13134
+        }
+      ],
+      "searchSteps": 1,
+      "expect": {
+        "ok": true,
+        "detail": "searches 1 (min 1)"
+      },
+      "criteria": [
+        {
+          "criterion": "Gives a specific version number.",
+          "pass": true,
+          "reason": "The answer states Node.js 26.13.0 as the latest stable release."
+        },
+        {
+          "criterion": "Cites a source with an [n] marker.",
+          "pass": true,
+          "reason": "The answer includes bracketed citation markers such as [1][5] and [2][8]."
+        },
+        {
+          "criterion": "Mentions a date (when the release was made, or when the answer was current).",
+          "pass": true,
+          "reason": "It gives the release date 28 Oct 2026 and other dates."
+        }
+      ],
+      "judgePassRate": 1,
+      "grounding": {
+        "status": "ok",
+        "supported": 5,
+        "cited": 6,
+        "flagged": [
+          {
+            "claim": "Node 24 (24.22.2) is now in maintenance, and Node 22 is still receiving security updates [2][8].",
+            "verdict": "number not in source",
+            "source": "2, 8",
+            "note": "Not in the cited text: 22"
+          }
+        ],
+        "verifier": "grounding",
+        "ms": 0
+      },
+      "groundingProbe": {
+        "tried": 4,
+        "caught": 3,
+        "pricesTried": 0,
+        "pricesCaught": 0,
+        "missed": [
+          "26 -> 31"
+        ]
+      },
+      "upheld": {
+        "status": "ok",
+        "supported": 2,
+        "cited": 6,
+        "flagged": [
+          {
+            "claim": "It's also the current Active LTS: Node 26 moved into Long Term Support on 28 Oct 2026 and will be supported until the end of April 2029.",
+            "verdict": "wrong_entity",
+            "source": "1"
+          },
+          {
+            "claim": "Node 24 (24.22.2) is now in maintenance, and Node 22 is still receiving security updates.",
+            "verdict": "unsupported",
+            "source": "2"
+          },
+          {
+            "claim": "Under the release-schedule change announced in March 2026, Node 26 is the last line on the old model; from Node 27 onward there's one major release per year (April) with LTS promotion in October, and every release becomes LTS.",
+            "verdict": "wrong_entity",
+            "source": "3"
+          },
+          {
+            "claim": "Node 27 is currently in alpha, with 27.0.0 due 22 Apr 2027.",
+            "verdict": "wrong_entity",
+            "source": "7"
+          }
+        ],
+        "verifier": "judge:granite-guardian-3.3-8b@0.06",
+        "ms": 9826
+      }
+    },
+    {
+      "id": "no-search-needed",
+      "description": "A pure rewrite: no web search should be needed.",
+      "now": "2026-11-10T15:00:00Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "Rewrite this to sound more professional: 'we gotta ship this by friday or we're toast'",
+          "answer": "\"We need to deliver this by Friday; otherwise, we risk missing the deadline entirely.\"",
+          "conversationId": "871f33ac-0cb5-4bde-a8a2-7d7039eb2cf0",
+          "queries": [],
+          "sources": [],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [],
+            "timings": {
+              "recallMs": 2,
+              "firstTokenMs": 1044,
+              "searchMs": 0,
+              "totalMs": 1234
+            },
+            "usage": {
+              "promptTokens": 1752,
+              "completionTokens": 17,
+              "cachedTokens": 1536
+            },
+            "recall": {
+              "hits": 0,
+              "refs": [
+                "friday = Fri 6 Nov 2026"
+              ],
+              "emptyRefs": [
+                "Fri 6 Nov 2026"
+              ]
+            }
+          },
+          "errors": [],
+          "wallMs": 1235
+        }
+      ],
+      "searchSteps": 0,
+      "expect": {
+        "ok": true,
+        "detail": "searches 0 (max 0)"
+      },
+      "criteria": [
+        {
+          "criterion": "Gives a professional rewrite of the sentence (it keeps the Friday deadline and the stakes).",
+          "pass": true,
+          "reason": "The rewrite keeps the Friday deadline and conveys the stakes as risking missing the deadline entirely."
+        },
+        {
+          "criterion": "Is brief: the rewrite, plus at most one short sentence of commentary.",
+          "pass": true,
+          "reason": "The answer contains only the rewrite with no additional commentary."
+        }
+      ],
+      "judgePassRate": 1,
+      "grounding": null,
+      "groundingProbe": null,
+      "upheld": null
+    },
+    {
+      "id": "follow-up",
+      "description": "A follow-up in the same conversation: short, consistent with the first answer, no new search.",
+      "now": "2026-11-10T15:00:00Z",
+      "tz": "Europe/London",
+      "turns": [
+        {
+          "question": "Compare Neon and Supabase free tiers.",
+          "answer": "**Supabase's free tier is the better fit for a single production-ish app with auth, storage and file hosting; Neon's is better for many small Postgres-only projects and branching.** They're not really the same product: Neon is Postgres (plus auth and a data API), Supabase is a whole backend platform.\n\n| | Neon Free | Supabase Free |\n|---|---|---|\n| Price | $0 | $0 |\n| Projects | 100 [10] | 2 active [2][4] |\n| Database storage | 1 GB per project, 20 GB account cap [10] | 500 MB total [2][4] |\n| Compute | 100 CU-hours per project/month, autoscale to 2 CU (~8 GB RAM), scales to zero after 5 min idle [10] | Shared CPU, 500 MB RAM [4] |\n| Branches | 10 per project, 6-hour restore window [5] | None on free |\n| Egress | 5 GB per project/month [10] | 10 GB (5 GB cached + 5 GB uncached) [6] |\n| Auth | Managed Better Auth, up to 60,000 MAU [5] | 50,000 MAU [4] |\n| File storage | — | 1 GB [4] |\n| Inactivity | Compute suspends when CU-hours/transfer run out [10] | Project paused after 1 week idle [2] |\n\nNotes:\n- Neon raised free storage from 0.5 GB to 1 GB per project on 2 Oct 2026 [1][7]. Neon's legacy Free/Launch/Scale tiers were retired for new signups, with paid users migrated in Feb 2026 [9] — so ignore older Neon pricing articles.\n- Neon doesn't bill overages on Free: you hit a wall instead (writes fail above 1 GB in a project; compute suspends when CU-hours or transfer are exhausted) [10].\n- Supabase's 500 MB database and 2-project cap are the binding constraints for anything real; the 1-week pause is the other gotcha [2].\n\nPick Neon for many throwaway/agent-generated Postgres projects, branching and preview databases. Pick Supabase if you want auth, file storage, realtime and edge functions in one place without wiring services together.",
+          "conversationId": "80eb3318-541f-4408-ab8d-858d0c1e8703",
+          "queries": [
+            [
+              {
+                "q": "free plan limits storage compute projects",
+                "site": "neon.com"
+              },
+              {
+                "q": "free plan limits database storage egress projects",
+                "site": "supabase.com"
+              },
+              {
+                "q": "Neon free plan 2026 limits changes"
+              }
+            ]
+          ],
+          "sources": [
+            {
+              "n": 10,
+              "url": "https://neon.com/faqs/free-plan-limits-and-quotas?a=96c320a7-a087-4afa-a5d7-7a8bdd3ffbe6",
+              "title": "What are the limits and quotas for Neon's Free plan? - Neon FAQs",
+              "site": "neon.com",
+              "published": "2026-05-17"
+            },
+            {
+              "n": 2,
+              "url": "https://supabase.com/pricing.md#1",
+              "title": "Supabase Pricing - Supabase Pricing",
+              "site": "supabase.com"
+            },
+            {
+              "n": 4,
+              "url": "https://supabase.com/pricing#1",
+              "title": "Pricing & Fees | Supabase - Predictable pricing,",
+              "site": "supabase.com"
+            },
+            {
+              "n": 5,
+              "url": "https://github.com/neondatabase/website/blob/6420cdb73bc86b8ab79987abf2a99f8f2aa9543b/content/blog/posts/neon-free-plan-1-gb-per-project.md",
+              "title": "Neon gives you 100 projects for free, with 1 GB of Postgres storage each",
+              "site": "github.com",
+              "published": "2026-11-07"
+            },
+            {
+              "n": 6,
+              "url": "https://supabase.com/docs/guides/storage/serving/bandwidth",
+              "title": "Bandwidth & Storage Egress | Supabase Docs",
+              "site": "supabase.com",
+              "published": "2026-11-08"
+            },
+            {
+              "n": 1,
+              "url": "https://neon.com/blog/neon-free-plan-1-gb-per-project?a=eba58b48-cf86-4b6a-b6e6-6ba6f51e7ce4",
+              "title": "Neon gives you 100 projects for free, with 1 GB of Postgres storage each - Neon",
+              "site": "neon.com",
+              "published": "2026-10-01"
+            },
+            {
+              "n": 7,
+              "url": "https://neon.com/docs/changelog/2026-10-02",
+              "title": "Changelog Oct 02, 2026 - Neon",
+              "site": "neon.com",
+              "published": "2026-10-01"
+            },
+            {
+              "n": 9,
+              "url": "https://raw.githubusercontent.com/neondatabase/website/refs/heads/main/content/docs/unused/legacy-plans.md#1",
+              "title": "raw.githubusercontent.com",
+              "site": "raw.githubusercontent.com"
+            }
+          ],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [
+              {
+                "queries": [
+                  {
+                    "q": "free plan limits storage compute projects",
+                    "site": "neon.com"
+                  },
+                  {
+                    "q": "free plan limits database storage egress projects",
+                    "site": "supabase.com"
+                  },
+                  {
+                    "q": "Neon free plan 2026 limits changes"
+                  }
+                ],
+                "ms": 588,
+                "sources": 10
+              }
+            ],
+            "timings": {
+              "recallMs": 1,
+              "firstTokenMs": 2497,
+              "searchMs": 589,
+              "totalMs": 5399
+            },
+            "usage": {
+              "promptTokens": 7178,
+              "completionTokens": 591,
+              "cachedTokens": 3328
+            },
+            "recall": {
+              "hits": 0,
+              "refs": [],
+              "emptyRefs": []
+            }
+          },
+          "errors": [],
+          "wallMs": 16312
+        },
+        {
+          "question": "Which would you pick for a weekend hobby project, in one sentence?",
+          "answer": "Neon — a weekend project is unlikely to need auth, storage or realtime, and its 100 free projects and branching mean you can spin up a fresh database per idea without hitting Supabase's 2-project cap [10][2].",
+          "conversationId": "80eb3318-541f-4408-ab8d-858d0c1e8703",
+          "queries": [],
+          "sources": [
+            {
+              "n": 10,
+              "url": "https://neon.com/faqs/free-plan-limits-and-quotas?a=96c320a7-a087-4afa-a5d7-7a8bdd3ffbe6",
+              "title": "What are the limits and quotas for Neon's Free plan? - Neon FAQs",
+              "site": "neon.com",
+              "published": "2026-05-17"
+            },
+            {
+              "n": 2,
+              "url": "https://supabase.com/pricing.md#1",
+              "title": "Supabase Pricing - Supabase Pricing",
+              "site": "supabase.com"
+            }
+          ],
+          "trace": {
+            "model": "deepseek-flash",
+            "steps": [],
+            "timings": {
+              "recallMs": 1,
+              "firstTokenMs": 491,
+              "searchMs": 0,
+              "totalMs": 867
+            },
+            "usage": {
+              "promptTokens": 2699,
+              "completionTokens": 49,
+              "cachedTokens": 1280
+            },
+            "recall": {
+              "hits": 0,
+              "refs": [],
+              "emptyRefs": []
+            }
+          },
+          "errors": [],
+          "wallMs": 3121
+        }
+      ],
+      "searchSteps": 0,
+      "expect": {
+        "ok": true,
+        "detail": "searches 0 (max 0)"
+      },
+      "criteria": [
+        {
+          "criterion": "Answers in about one sentence.",
+          "pass": true,
+          "reason": "The answer is a single sentence."
+        },
+        {
+          "criterion": "Is consistent with the first answer about Neon and Supabase free tiers (it picks one of the two that the first answer supports).",
+          "pass": true,
+          "reason": "It picks Neon, which the first answer recommended for many small Postgres-only projects, and cites the 100-project and branching points."
+        },
+        {
+          "criterion": "Does not run an unnecessary new search for this follow-up.",
+          "pass": true,
+          "reason": "No searches were run for this message."
+        }
+      ],
+      "judgePassRate": 1,
+      "grounding": {
+        "status": "ok",
+        "supported": 1,
+        "cited": 1,
+        "flagged": [],
+        "verifier": "grounding",
+        "ms": 0
+      },
+      "groundingProbe": {
+        "tried": 2,
+        "caught": 2,
+        "pricesTried": 0,
+        "pricesCaught": 0,
+        "missed": []
+      },
+      "upheld": {
+        "status": "ok",
+        "supported": 0,
+        "cited": 1,
+        "flagged": [
+          {
+            "claim": "Neon — a weekend project is unlikely to need auth, storage or realtime, and its 100 free projects and branching mean you can spin up a fresh database per idea without hitting Supabase's 2-project cap.",
+            "verdict": "unsupported",
+            "source": "10"
+          }
+        ],
+        "verifier": "judge:granite-guardian-3.3-8b@0.06",
+        "ms": 2025
+      }
+    }
+  ]
+}

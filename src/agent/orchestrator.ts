@@ -9,13 +9,14 @@
 // The model only ever sees one tool. Memory is context, not a tool: it is retrieved before
 // the first token, so recalling "last Tuesday" costs no extra model round trip.
 import { config } from '../config.js';
-import { type Message, streamChat, type ToolCall, type Usage } from '../llm/deepseek.js';
+import { type Effort, type Message, streamChat, type ToolCall, type Usage } from '../llm/deepseek.js';
 import { recall } from '../memory/recall.js';
 import type { MemoryStore } from '../memory/store.js';
 import { safeTz } from '../memory/temporal.js';
 import { processTurn } from '../memory/writer.js';
 import { DeepSeekSearch, formatResultsForModel, SourceRegistry, webSearch } from '../search/index.js';
 import type { AgentEvent, SearchProvider, SearchQuery, Source, SourceSummary, TurnInput, TurnMemory, TurnTrace } from '../types.js';
+import { groundAnswer } from '../verify/grounding.js';
 import { upheldEnabled, verifyAnswer } from '../verify/upheld.js';
 import { citedNumbers, dropUnknownCitations } from './citations.js';
 import { contextMessage, historyMessages } from './context.js';
@@ -90,11 +91,16 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   ];
 
   // ── the loop: stream a step; if it calls web_search, run the searches and go again ──
+  const mode = config.reasoningEffort;
+  let searchRounds = 0;
+  let thinkingMs = 0;
   const trace: TurnTrace = {
     model: config.chatModel,
+    effort: mode,
     steps: [],
-    timings: { recallMs: Math.round(memory.ms), firstTokenMs: null, searchMs: 0, totalMs: 0 },
-    usage: { promptTokens: 0, completionTokens: 0, cachedTokens: 0 },
+    searchRounds: 0,
+    timings: { recallMs: Math.round(memory.ms), firstTokenMs: null, searchMs: 0, thinkingMs: 0, totalMs: 0 },
+    usage: { promptTokens: 0, completionTokens: 0, cachedTokens: 0, reasoningTokens: 0 },
     recall: { hits: memory.hits.length, refs: memory.refs.map((r) => `${r.text} = ${r.label}`), emptyRefs: memory.emptyRefs.map((r) => r.label) },
   };
   let content = '';
@@ -104,17 +110,40 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
       const canSearch = step < config.maxSearchSteps;
       if (!canSearch) messages.push({ role: 'system', content: ANSWER_NOW });
 
+      // At low effort the model sizes its own thinking to the question: under 100 reasoning
+      // tokens for an easy one, about 2,000 for capacity maths (evals/effort/).
+      const effort: Effort = mode;
       let stepFirstToken: number | null = null;
-      let result: { content: string; toolCalls: ToolCall[]; usage: Usage } | undefined;
-      for await (const piece of streamChat({ messages, tools: [WEB_SEARCH_TOOL], toolChoice: canSearch ? 'auto' : 'none', signal: input.signal })) {
-        if (piece.type === 'content') {
+      let thinkingFrom: number | null = null;
+      let thinkingTo = 0;
+      let result: { content: string; reasoning: string; toolCalls: ToolCall[]; usage: Usage } | undefined;
+      const stopThinking = () => {
+        if (thinkingFrom === null) return;
+        thinkingMs += thinkingTo - thinkingFrom;
+        trace.timings.thinkingMs = thinkingMs;
+        thinkingFrom = null;
+        emit({ type: 'status', text: '' });
+      };
+      for await (const piece of streamChat({ messages, tools: [WEB_SEARCH_TOOL], toolChoice: canSearch ? 'auto' : 'none', effort, signal: input.signal })) {
+        if (piece.type === 'reasoning') {
+          if (thinkingFrom === null) {
+            thinkingFrom = elapsed();
+            // "Thinking…" is the first thing the user sees, so it is the turn's first activity.
+            trace.timings.firstActivityMs ??= thinkingFrom;
+            emit({ type: 'status', text: 'Thinking…' });
+          }
+          thinkingTo = elapsed();
+        } else if (piece.type === 'content') {
+          stopThinking();
           stepFirstToken ??= elapsed();
+          trace.timings.firstActivityMs ??= stepFirstToken;
           content += piece.text;
           emit({ type: 'token', step, text: piece.text });
         } else {
           result = piece;
         }
       }
+      stopThinking();
       if (!result) throw new Error('model stream ended without a result');
       addUsage(trace.usage, result.usage);
 
@@ -126,11 +155,14 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
 
       // Text written before a tool call is a preamble, not the answer.
       content = '';
+      trace.searchRounds = ++searchRounds;
       messages.push({
         role: 'assistant',
         content: result.content || null,
         tool_calls: result.toolCalls.map((tc) => ({ id: tc.id, type: 'function' as const, function: { name: tc.name, arguments: tc.arguments } })),
-      });
+        // DeepSeek rejects a thinking request with tools unless earlier reasoning in the turn comes back.
+        ...(result.reasoning ? { reasoning_content: result.reasoning } : {}),
+      } as Message);
 
       const s0 = performance.now();
       // At most QUERIES_PER_STEP queries a step, however many calls they arrive in: a question's
@@ -188,8 +220,11 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   const notes = processTurn(store, turn, isNew || !conversation.title);
   track(notes);
 
-  if (upheldEnabled() && cited.length) {
-    const verification = await verifyAnswer({ question: input.message, answer: content, sources: cited }, { signal: input.signal });
+  // The grounding check runs on every cited answer; upheld, when configured, replaces it with
+  // the deeper model-based check.
+  if (cited.length) {
+    const check = { question: input.message, answer: content, sources: cited };
+    const verification = upheldEnabled() ? await verifyAnswer(check, { signal: input.signal }) : groundAnswer(check);
     store.setVerification(messageId, verification);
     emit({ type: 'verification', messageId, verification });
   }
@@ -241,6 +276,7 @@ function addUsage(total: TurnTrace['usage'], u: Usage): void {
   total.promptTokens += u.promptTokens;
   total.completionTokens += u.completionTokens;
   total.cachedTokens += u.cachedTokens;
+  total.reasoningTokens = (total.reasoningTokens ?? 0) + u.reasoningTokens;
 }
 
 function provisionalTitle(message: string): string {

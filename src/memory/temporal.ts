@@ -6,6 +6,9 @@ import { DateTime } from 'luxon';
 import type { Clock, TimeRef } from '../types.js';
 
 const WEEKDAY = '(monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
+const MONTH = '(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\b';
+/** Words that make "the 3rd …" an item in a list rather than a day. */
+const ORDINAL_NOUN = '(?:option|one|item|choice|pick|place|point|time|tool|answer|question|row|step|plan|tier|result|link|source|line|attempt)s?\\b';
 const NUMBER_WORDS: Record<string, number> = {
   a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5,
   six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
@@ -168,6 +171,23 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
     const alternates = wd === today.weekday ? [{ first: today, last: today }] : undefined;
     return spanRef(m[0], { first: day, last: day }, alternates);
   });
+
+  // A day of the month on its own ("on the 3rd") is the most recent such day: this month's if it
+  // has come, otherwise last month's. "The 3rd of November" is left to chrono, and "the 3rd
+  // option" is not a date. A month without that day ("the 31st" after November) is skipped.
+  scan(
+    new RegExp(`\\b(?:on|from|since)\\s+the\\s+(\\d{1,2})(?:st|nd|rd|th)\\b(?!\\s+(?:of\\s+)?${MONTH})(?!\\s+${ORDINAL_NOUN})`, 'gi'),
+    (m) => {
+      const dom = Number(m[1]);
+      for (let back = 0; back < 3; back++) {
+        const month = today.startOf('month').minus({ months: back });
+        if (dom > month.daysInMonth!) continue;
+        const day = month.set({ day: dom });
+        if (day.toMillis() <= today.toMillis()) return spanRef(m[0], { first: day, last: day });
+      }
+      return null;
+    },
+  );
 
   // Anything chrono finds that the rules above did not claim: "3 November", "12 Mar 2026",
   // "3 to 5 November". Chrono does not know the user's timezone, so the offset is passed in.

@@ -419,8 +419,44 @@ function setHeader(text) {
   document.title = `${text} · since`;
 }
 
+/** Copies text and confirms on the button itself, so nothing else on screen moves. */
+async function copyText(text, button) {
+  const label = button.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = 'Copied';
+  } catch {
+    // No clipboard permission (or an insecure context): say so rather than fail silently.
+    button.textContent = 'Select to copy';
+  }
+  setTimeout(() => {
+    button.textContent = label;
+  }, 1400);
+}
+
+/** Puts a past message back in the composer, so it can be sent again with changes. */
+function editMessage(text) {
+  dom.input.value = text;
+  autosize();
+  updateSendState();
+  dom.input.focus();
+  dom.input.setSelectionRange(text.length, text.length);
+}
+
+function actionRow(...buttons) {
+  return el('div', { class: 'msg-actions' }, buttons);
+}
+
 function userBubble(text) {
-  return el('div', { class: 'msg user' }, el('div', { class: 'bubble' }, text));
+  const copy = el('button', { type: 'button', class: 'msg-action', title: 'Copy this message' }, 'Copy');
+  copy.addEventListener('click', () => copyText(text, copy));
+  const edit = el('button', { type: 'button', class: 'msg-action', title: 'Edit this message and send it again' }, 'Edit');
+  edit.addEventListener('click', () => editMessage(text));
+  return el(
+    'div',
+    { class: 'msg user' },
+    el('div', { class: 'user-wrap' }, el('div', { class: 'bubble' }, text), actionRow(copy, edit)),
+  );
 }
 
 /** Every piece of an assistant message, in display order. Live and stored turns share it. */
@@ -435,6 +471,11 @@ function assistantShell() {
     verify: el('div', { class: 'verify-slot' }),
     error: el('div'),
   };
+  // Reads the rendered answer at click time, so it works the same for a live and a stored turn.
+  const copy = el('button', { type: 'button', class: 'msg-action', title: 'Copy the answer' }, 'Copy');
+  copy.addEventListener('click', () => copyText((parts.answer.innerText ?? '').trim(), copy));
+  parts.actions = actionRow(copy);
+  parts.actions.hidden = true;
   parts.root = el(
     'article',
     { class: 'msg assistant', 'aria-label': 'Assistant answer' },
@@ -445,6 +486,7 @@ function assistantShell() {
     parts.sources,
     parts.meta,
     parts.verify,
+    parts.actions,
     parts.error,
   );
   return parts;
@@ -579,6 +621,8 @@ function wrapTables(root) {
 }
 
 function setAnswer(parts, text, lookup) {
+  // Nothing to copy until there is an answer.
+  if (parts.actions) parts.actions.hidden = !text;
   if (!text) {
     parts.answer.replaceChildren();
     return;
@@ -644,11 +688,16 @@ function paintMeta(parts, trace) {
     bits.push(`first token ${fmtSecs(timings.firstTokenMs)}`);
   }
   bits.push(steps === 1 ? '1 search' : `${steps} searches`);
+  if ((timings.thinkingMs ?? 0) >= 500) bits.push(`thought ${fmtSecs(timings.thinkingMs)}`);
 
   const details = el(
     'pre',
     { class: 'details', hidden: true },
-    JSON.stringify({ model: trace.model, timings, usage: trace.usage, recall: trace.recall, steps: trace.steps }, null, 2),
+    JSON.stringify(
+      { model: trace.model, effort: trace.effort, searchRounds: trace.searchRounds, timings, usage: trace.usage, recall: trace.recall, steps: trace.steps },
+      null,
+      2,
+    ),
   );
   const toggle = el('button', { type: 'button', class: 'link-btn', 'aria-expanded': 'false' }, 'Details');
   toggle.addEventListener('click', () => {
@@ -664,9 +713,14 @@ function setVerifyPending(parts) {
   parts.verify.replaceChildren(el('span', { class: 'muted small' }, 'Checking citations…'));
 }
 
+const GROUNDING_HOW =
+  'Each figure in a cited claim was looked for in the passages of the source it cites. ' +
+  "It runs on every answer, with no model: it catches a figure that isn't on the page, not a misreading of one that is.";
+
 function paintVerification(slot, v) {
   slot.replaceChildren();
   if (!v) return;
+  const grounding = v.verifier === 'grounding';
   if (v.status === 'skipped') {
     slot.append(el('span', { class: 'muted small' }, 'Citation check skipped'));
     return;
@@ -675,17 +729,25 @@ function paintVerification(slot, v) {
     slot.append(el('span', { class: 'verify-badge', title: v.error ?? '' }, 'Citation check unavailable'));
     return;
   }
+  if (grounding && v.cited === 0) {
+    slot.append(el('span', { class: 'muted small', title: GROUNDING_HOW }, 'Grounding check: no cited figures to check'));
+    return;
+  }
   const flagged = v.flagged ?? [];
   const good = v.cited > 0 && v.supported === v.cited;
   const panel = el(
-    'ul',
+    'div',
     { class: 'flagged', hidden: true },
-    flagged.length ? flagged.map(flaggedItem) : el('li', { class: 'muted' }, 'No flagged claims.'),
+    grounding ? el('p', { class: 'how' }, GROUNDING_HOW) : null,
+    el('ul', null, flagged.length ? flagged.map(flaggedItem) : el('li', { class: 'muted' }, 'No flagged claims.')),
   );
+  const label = grounding
+    ? `Grounding check: ${v.supported}/${v.cited} grounded`
+    : `Citations checked: ${v.supported}/${v.cited} supported`;
   const badge = el(
     'button',
     { type: 'button', class: `verify-badge ${good ? 'good' : 'warn'}`, 'aria-expanded': 'false' },
-    `Citations checked: ${v.supported}/${v.cited} supported`,
+    label,
   );
   badge.addEventListener('click', () => {
     panel.hidden = !panel.hidden;
@@ -698,7 +760,7 @@ function flaggedItem(f) {
   return el(
     'li',
     null,
-    el('span', { class: 'verdict' }, f.verdict),
+    el('span', { class: 'verdict' }, String(f.verdict).replace(/_/g, ' ')),
     ' ',
     el('span', null, f.claim),
     f.note ? el('div', { class: 'note' }, f.note) : null,

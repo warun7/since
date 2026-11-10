@@ -1,4 +1,4 @@
-// Runs the eval scenarios end to end: fixture history -> live turns -> judge (+ upheld).
+// Runs the eval scenarios end to end: fixture history -> live turns -> judge, grounding check (+ upheld).
 // Usage: npm run eval [-- --only recall-by-date,crm-shortlist]
 // Writes evals/results/<runId>/ with one SQLite DB per scenario and report.json.
 import 'dotenv/config';
@@ -11,7 +11,9 @@ import { openStore } from '../src/memory/db.js';
 import type { MemoryStore } from '../src/memory/store.js';
 import { judge, type Criterion } from './judge.js';
 import { scenarios, type FixtureTurn, type Scenario } from './scenarios.js';
+import { groundAnswer } from '../src/verify/grounding.js';
 import { upheldEnabled, verifyAnswer } from '../src/verify/upheld.js';
+import { probeGrounding, type GroundingProbe } from './grounding-probe.js';
 import type { Claim, Source, SourceSummary, SearchQuery, TurnTrace, Verification } from '../src/types.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -39,6 +41,9 @@ interface ScenarioRecord {
   expect: { ok: boolean; detail: string };
   criteria: Criterion[];
   judgePassRate: number;
+  /** The model-free grounding check on the final answer, and how often it caught a planted wrong figure. */
+  grounding: Verification | null;
+  groundingProbe: GroundingProbe | null;
   upheld: Verification | null;
   error?: string;
 }
@@ -109,6 +114,8 @@ async function runScenario(sc: Scenario, runDir: string): Promise<ScenarioRecord
     expect: { ok: true, detail: '' },
     criteria: [],
     judgePassRate: 0,
+    grounding: null,
+    groundingProbe: null,
     upheld: null,
   };
   const store = openStore(join(runDir, `${sc.id}.db`));
@@ -165,10 +172,13 @@ async function runScenario(sc: Scenario, runDir: string): Promise<ScenarioRecord
     record.criteria = verdict.criteria;
     record.judgePassRate = verdict.passRate;
 
-    if (upheldEnabled() && last.conversationId && last.answer) {
+    if (last.conversationId && last.answer && last.sources.length) {
       const cited = new Set(last.sources.map((s) => s.n));
       const stored = store.getSources(last.conversationId).filter((s) => cited.has(s.n));
-      record.upheld = await verifyAnswer({ question: last.question, answer: last.answer, sources: stored });
+      const check = { question: last.question, answer: last.answer, sources: stored };
+      record.grounding = groundAnswer(check);
+      record.groundingProbe = probeGrounding(check);
+      if (upheldEnabled()) record.upheld = await verifyAnswer(check);
     }
   } catch (err) {
     record.error = err instanceof Error ? err.message : String(err);
@@ -179,12 +189,19 @@ async function runScenario(sc: Scenario, runDir: string): Promise<ScenarioRecord
 }
 
 const secs = (ms: number | null | undefined) => (typeof ms === 'number' ? (ms / 1000).toFixed(2) : '-');
+const words = (text: string) => text.split(/\s+/).filter(Boolean).length;
+/** Nearest-rank percentile: p50 of 15 values is the 8th smallest, p95 the 15th. */
+const percentile = (xs: number[], p: number): number | null => {
+  if (!xs.length) return null;
+  const sorted = [...xs].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1)]!;
+};
 const pad = (s: string, n: number) => (s.length >= n ? s : s + ' '.repeat(n - s.length));
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
 function printTable(records: ScenarioRecord[]): void {
-  const header = ['id', 'judge', 'expect', 'searches', 'first tok s', 'total s', 'upheld S/C'];
-  const widths = [24, 7, 8, 9, 12, 9, 11];
+  const header = ['id', 'judge', 'expect', 'searches', 'first tok s', 'total s', 'think s', 'reason tok', 'words', 'grounded', 'upheld S/C'];
+  const widths = [26, 7, 8, 9, 12, 9, 8, 11, 6, 9, 11];
   const line = (cells: string[]) => cells.map((c, i) => pad(c, widths[i]!)).join(' ');
   console.log('\n' + line(header));
   console.log(widths.map((w) => '-'.repeat(w)).join(' '));
@@ -203,6 +220,10 @@ function printTable(records: ScenarioRecord[]): void {
         String(r.searchSteps),
         secs(lastTurn?.trace?.timings.firstTokenMs),
         secs(lastTurn?.trace?.timings.totalMs),
+        secs(lastTurn?.trace?.timings.thinkingMs),
+        String(lastTurn?.trace?.usage.reasoningTokens ?? 0),
+        String(words(lastTurn?.answer ?? '')),
+        r.grounding ? `${r.grounding.supported}/${r.grounding.cited}` : '-',
         up,
       ]),
     );
@@ -214,14 +235,45 @@ function summarise(records: ScenarioRecord[]) {
   const lastTraces = records.map((r) => r.turns[r.turns.length - 1]?.trace).filter((t): t is TurnTrace => !!t);
   const firstTokens = lastTraces.map((t) => t.timings.firstTokenMs).filter((x): x is number => typeof x === 'number');
   const upheldRuns = records.map((r) => r.upheld).filter((u): u is Verification => !!u && u.status === 'ok');
+  const groundingRuns = records.map((r) => r.grounding).filter((g): g is Verification => !!g);
+  const probes = records.map((r) => r.groundingProbe).filter((p): p is GroundingProbe => !!p);
+  const total = <T>(xs: T[], f: (x: T) => number) => xs.reduce((a, x) => a + f(x), 0);
+  // Latency and thinking are read over every turn, follow-ups included: a follow-up is where
+  // thinking can add a search the first turn didn't need.
+  const allTraces = records.flatMap((r) => r.turns.map((t) => t.trace)).filter((t): t is TurnTrace => !!t);
+  const allFirst = allTraces.map((t) => t.timings.firstTokenMs).filter((x): x is number => typeof x === 'number');
+  const allTotal = allTraces.map((t) => t.timings.totalMs);
+  const grounded = total(groundingRuns, (g) => g.supported);
+  const cited = total(groundingRuns, (g) => g.cited);
   return {
     scenarios: records.length,
     avgJudgePassRate: avg(records.map((r) => r.judgePassRate)),
     expectPassed: records.filter((r) => r.expect.ok).length,
     avgFirstTokenMs: avg(firstTokens),
     avgTotalMs: avg(lastTraces.map((t) => t.timings.totalMs)),
+    turns: {
+      count: allTraces.length,
+      firstTokenMs: { p50: percentile(allFirst, 50), p95: percentile(allFirst, 95) },
+      totalMs: { p50: percentile(allTotal, 50), p95: percentile(allTotal, 95) },
+      avgReasoningTokens: avg(allTraces.map((t) => t.usage.reasoningTokens ?? 0)),
+      avgThinkingMs: avg(allTraces.map((t) => t.timings.thinkingMs ?? 0)),
+      avgSearchRounds: avg(allTraces.map((t) => t.searchRounds ?? 0)),
+    },
+    avgAnswerWords: avg(records.map((r) => words(r.turns.at(-1)?.answer ?? ''))),
+    /** Cited claims with a figure that the grounding check could not find on the cited page. */
+    groundingFlagRate: cited ? (cited - grounded) / cited : null,
+    grounding: groundingRuns.length
+      ? {
+          grounded,
+          cited,
+          plantedCaught: total(probes, (p) => p.caught),
+          plantedTried: total(probes, (p) => p.tried),
+          plantedPricesCaught: total(probes, (p) => p.pricesCaught),
+          plantedPricesTried: total(probes, (p) => p.pricesTried),
+        }
+      : null,
     upheld: upheldRuns.length
-      ? { supported: upheldRuns.reduce((a, u) => a + u.supported, 0), cited: upheldRuns.reduce((a, u) => a + u.cited, 0) }
+      ? { supported: total(upheldRuns, (u) => u.supported), cited: total(upheldRuns, (u) => u.cited) }
       : null,
   };
 }
@@ -245,10 +297,11 @@ async function main(): Promise<void> {
   }
   const selected = only ? scenarios.filter((s) => only.has(s.id)) : scenarios;
 
-  const runId = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  // The effort is in the run id, so two arms started in the same second don't share a folder.
+  const runId = `${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}-${config.reasoningEffort}`;
   const runDir = join(HERE, 'results', runId);
   mkdirSync(runDir, { recursive: true });
-  console.log(`run ${runId}: ${selected.length} scenario(s), model ${config.chatModel}, upheld ${upheldEnabled() ? 'on' : 'off'}`);
+  console.log(`run ${runId}: ${selected.length} scenario(s), model ${config.chatModel}, thinking ${config.reasoningEffort}, upheld ${upheldEnabled() ? 'on' : 'off'}`);
 
   const records: ScenarioRecord[] = [];
   for (const sc of selected) {
@@ -262,13 +315,26 @@ async function main(): Promise<void> {
     `\naverages: judge ${summary.avgJudgePassRate === null ? '-' : pct(summary.avgJudgePassRate)} · expect ${summary.expectPassed}/${summary.scenarios} · ` +
       `first token ${summary.avgFirstTokenMs === null ? '-' : (summary.avgFirstTokenMs / 1000).toFixed(2) + ' s'} · ` +
       `total ${summary.avgTotalMs === null ? '-' : (summary.avgTotalMs / 1000).toFixed(2) + ' s'}` +
+      (summary.grounding
+        ? ` · grounding ${summary.grounding.grounded}/${summary.grounding.cited} claims grounded, ` +
+          `${summary.grounding.plantedCaught}/${summary.grounding.plantedTried} planted wrong figures caught ` +
+          `(${summary.grounding.plantedPricesCaught}/${summary.grounding.plantedPricesTried} prices and percentages)`
+        : '') +
       (summary.upheld ? ` · upheld ${summary.upheld.supported}/${summary.upheld.cited} cited claims supported` : ''),
+  );
+  const t = summary.turns;
+  console.log(
+    `over ${t.count} turns: first token p50 ${secs(t.firstTokenMs.p50)} s, p95 ${secs(t.firstTokenMs.p95)} s · ` +
+      `total p50 ${secs(t.totalMs.p50)} s, p95 ${secs(t.totalMs.p95)} s · ` +
+      `${Math.round(t.avgReasoningTokens ?? 0)} reasoning tokens and ${secs(t.avgThinkingMs)} s thinking a turn · ` +
+      `${(t.avgSearchRounds ?? 0).toFixed(2)} search rounds a turn · ${Math.round(summary.avgAnswerWords ?? 0)} words a final answer` +
+      (summary.groundingFlagRate === null ? '' : ` · grounding flags ${pct(summary.groundingFlagRate)} of cited figures`),
   );
 
   const reportPath = join(runDir, 'report.json');
   writeFileSync(
     reportPath,
-    JSON.stringify({ runId, model: config.chatModel, upheld: upheldEnabled(), summary, scenarios: records }, null, 2),
+    JSON.stringify({ runId, model: config.chatModel, effort: config.reasoningEffort, upheld: upheldEnabled(), summary, scenarios: records }, null, 2),
   );
   console.log(`\nreport: ${reportPath}`);
 }
