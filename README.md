@@ -4,13 +4,13 @@ A chat agent with one tool, web search, that remembers what it told you and chec
 
 Ask it "Last Tuesday I asked you about Postgres hosting. Has any pricing changed since then?" and it works out which Tuesday you mean, finds that conversation, lists the prices it quoted then, re-checks each one against the vendors' pages and recent news, and tells you what moved, with sources.
 
-**Try it:** https://since.varunsg.com. Each visitor gets their own memory. To try the memory questions, click **Add example history** first.
+**Try it, no key needed:** https://since.varunsg.com. Each visitor gets their own memory. To try the memory questions, click **Add example history** first.
 
-How it's built, and why: [DESIGN.md](DESIGN.md).
+How it's built, and why: [DESIGN.md](DESIGN.md). Last eval run: 7/7 behaviour checks, 3.4 s on average to the first token, 4.8 s in total.
 
 ## Run it
 
-Needs Node 22+ and a [DeepSeek API key](https://platform.deepseek.com/api_keys). The one key covers both the model and web search (DeepSeek's Search API).
+**Needs a [DeepSeek API key](https://platform.deepseek.com/api_keys)**, and Node 22+. The one key powers both the model and web search (DeepSeek's Search API), so another provider's key won't work in its place.
 
 ```bash
 npm install
@@ -66,3 +66,5 @@ Set `CANONICAL_ORIGIN` in `cloud/cloudflare.config.ts` to your own address, or r
 ## Optional: citation checks with upheld
 
 [upheld](https://github.com/warun7/upheld) checks whether each cited sentence is backed by the source it cites. Run `UPHELD_MAX_CONCURRENT=1 upheld serve` (one audit at a time, since the local judge model can't run two at once) and set `UPHELD_URL=http://127.0.0.1:8000` in `.env`. After each answer has streamed, its citations are checked against the exact passages the model was shown, and the result appears under the answer. `npm run eval` also reports the support rate per scenario.
+
+It's off in the hosted demo: upheld runs its checking models on your machine (about 4 GB, plus 8.7 GB for the judge model), and the demo has no model server behind it.

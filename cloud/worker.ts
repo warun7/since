@@ -69,7 +69,12 @@ function useSettings(env: Env): void {
   process.env.LOG_DETAILS ||= '0';
 }
 
-/** One visitor's memory and API. */
+/**
+ * One visitor's memory and API. A turn runs here, and so do its memory notes, written in the
+ * background after the answer has streamed. They need no waitUntil (which Durable Objects keep
+ * only for compatibility): the object stays in memory for 70 s or more after its last request,
+ * and the notes take a few seconds.
+ */
 export class Visitor extends DurableObject<Env> {
   private open?: { store: MemoryStore; api: Hono };
 

@@ -21,7 +21,7 @@ then, in the background: save title, summary and claims · optional upheld check
 
 The prompt also enforces honesty: never invent a past conversation, say first when a date has no record, and count only things dated after "since <date>".
 
-**Hosted the same way.** Memory sits behind a small synchronous `Sql` interface. Locally it's a SQLite file; on Cloudflare each visitor gets a Durable Object with its own built-in SQLite. The store, schema and API are the same code, and visitors never see each other's history. A Worker in front sets the visitor cookie and rate-limits each network; questions are counted per visitor, per network and site-wide, and only once they've passed every check.
+**Hosted the same way.** Memory sits behind a small synchronous `Sql` interface. Locally it's a SQLite file; on Cloudflare each visitor gets a Durable Object with its own built-in SQLite. The store, schema and API are the same code, and visitors never see each other's history. A Worker in front sets the visitor cookie and rate-limits each network; questions are counted per visitor, per network and site-wide, and only once they've passed every check. Memory notes finish inside the visitor's Durable Object, which outlives the response. upheld stays local: it needs its own models.
 
 ## Considered and rejected
 
@@ -36,7 +36,7 @@ The prompt also enforces honesty: never invent a past conversation, say first wh
 
 `npm test`: 85 offline unit tests (dates across timezones, recall, ranking, passages, citations, API limits). `npm run eval`: seven scenarios with a fixed clock and fixture history, scored by an LLM judge against a rubric, plus checks on search use and upheld's support rate. Last full run: 7/7 behaviour checks, a 100% judge score, 3.4 s average to the first token, 4.8 s in total.
 
-upheld found what reading the answers didn't: a then/now table row mixes an old value with a new citation, so whole rows failed. Checking each cited cell separately raised support from 8/35 to 17/28. Most remaining flags are real errors, such as an old number cited to today's page.
+upheld caught what reading the answers didn't: in then/now tables, one citation covered a whole row, so old values were cited to today's page. Citing each cell separately took supported citations from 8 of 35 to 17 of 28 across the seven scenarios. Most of the 11 still flagged are real errors of that kind; the rest are judge false alarms (about 1 good citation in 5).
 
 ## With another week
 
