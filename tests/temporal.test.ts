@@ -92,6 +92,48 @@ describe('resolveTimeRefs', () => {
     expect(resolveTimeRefs('I went with the one on the 3rd option', tuesday)).toEqual([]);
   });
 
+  const labels = (text: string, clock: Clock = tuesday) => resolveTimeRefs(text, clock).map((r) => r.label);
+
+  it('reads "the day before yesterday" as two days back, not as yesterday', () => {
+    expect(labels('the day before yesterday you told me')).toEqual(['Sun 8 Nov 2026']);
+  });
+
+  it('reads short day names after "last" or "on", but not "sat" or "sun" as words', () => {
+    expect(labels('last Tues')).toEqual(['Tue 3 Nov 2026']);
+    expect(labels('on Thurs we shortlisted')).toEqual(['Thu 5 Nov 2026']);
+    expect(labels('I sat down with the team and the sun came out')).toEqual([]);
+  });
+
+  it('reads weekends, weeks ago and "the other week" as spans', () => {
+    expect(labels('over the weekend')).toEqual(['Sat 7 Nov – Sun 8 Nov 2026']);
+    // A fortnight back is Tue 27 Oct, give or take three days.
+    expect(labels('a fortnight ago')).toEqual(['Sat 24 Oct – Fri 30 Oct 2026']);
+    expect(labels('the other week')).toEqual(['Tue 20 Oct – Tue 3 Nov 2026']);
+    expect(labels('next weekend')).toEqual([]);
+  });
+
+  it('reads a month with no day, and its early, mid or late part', () => {
+    expect(labels('back in October')).toEqual(['Thu 1 Oct – Sat 31 Oct 2026']);
+    // Early November runs to the 10th, which is today.
+    expect(labels('in early November')).toEqual(['Sun 1 Nov – Tue 10 Nov 2026']);
+    expect(labels('in March 2025')).toEqual(['Sat 1 Mar – Mon 31 Mar 2025']);
+    expect(labels('at the start of last month')).toEqual(['Thu 1 Oct – Sat 10 Oct 2026']);
+    expect(labels('you may have said')).toEqual([]);
+  });
+
+  it("reads 3/11 the user's way round, and keeps the other reading", () => {
+    const [ldn] = resolveTimeRefs('what did I ask on 3/11?', tuesday);
+    expect(ldn).toMatchObject({ label: 'Tue 3 Nov 2026', alternates: [{ label: 'Wed 11 Mar 2026' }] });
+    const ny: Clock = { now: tuesday.now, tz: 'America/New_York' };
+    const [us] = resolveTimeRefs('what did I ask on 3/11?', ny);
+    expect(us).toMatchObject({ label: 'Wed 11 Mar 2026', alternates: [{ label: 'Tue 3 Nov 2026' }] });
+    expect(labels('on 13/10')).toEqual(['Tue 13 Oct 2026']);
+  });
+
+  it('leaves a fraction alone', () => {
+    expect(labels('what is 3/4 of 200?')).toEqual([]);
+  });
+
   it('returns nothing for a message with no time reference', () => {
     expect(resolveTimeRefs("What's the weather like?", tuesday)).toEqual([]);
   });

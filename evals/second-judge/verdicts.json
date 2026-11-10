@@ -1,0 +1,573 @@
+{
+  "note": "Blind re-grade by Claude (Anthropic) of the same rubric lines the DeepSeek judge scored, from the same material.",
+  "agreement": "58/63",
+  "verdicts": [
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date",
+      "criterion": "Restates the 3 November question accurately (managed Postgres hosting for a small production app, entry paid plans).",
+      "deepseek": true,
+      "deepseekReason": "It says the user asked which managed Postgres options were cheapest for a small production app, comparing entry paid plans.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date",
+      "criterion": "Re-checks the earlier claims against current sources rather than simply repeating the old answer.",
+      "deepseek": true,
+      "deepseekReason": "It reports search queries and updated figures with citations, noting Neon changed and others unchanged.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date",
+      "criterion": "For each provider (Neon, Supabase, Render, AWS RDS), says whether its price still holds, changed (old -> new), or could not be verified.",
+      "deepseek": true,
+      "deepseekReason": "The table gives a status for all four providers, including old and new values.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date",
+      "criterion": "Cites sources with [n] markers.",
+      "deepseek": true,
+      "deepseekReason": "The answer includes bracketed numeric citations such as [7], [8], [14], [19].",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date",
+      "criterion": "Uses absolute dates (for example 3 November 2026), not only \"last week\" or \"today\".",
+      "deepseek": true,
+      "deepseekReason": "It uses absolute dates like 3 Nov 2026 and 10 Nov 2026.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "no-record",
+      "criterion": "Says plainly that it has no record of a conversation on 3 November 2026.",
+      "deepseek": true,
+      "deepseekReason": "It explicitly states it has no record of a conversation on Tue 3 Nov 2026.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "no-record",
+      "criterion": "Does not invent a past question or answer.",
+      "deepseek": true,
+      "deepseekReason": "It invents no prior question or answer, only noting no past conversations exist.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "no-record",
+      "criterion": "Offers a useful next step (for example, asking the question again, or describing what they remember).",
+      "deepseek": false,
+      "deepseekReason": "It offers no next step or suggestion for how to proceed.",
+      "claude": false,
+      "claudeReason": "No next step is offered."
+    },
+    {
+      "run": "low-2",
+      "scenario": "no-record",
+      "criterion": "Is short: no more than about four sentences.",
+      "deepseek": true,
+      "deepseekReason": "The answer is two sentences long.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "last-tuesday-postgres",
+      "criterion": "Identifies last Tuesday as 3 November 2026.",
+      "deepseek": true,
+      "deepseekReason": "The answer explicitly references 'Tue 3 Nov 2026' as the earlier date.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "last-tuesday-postgres",
+      "criterion": "Covers each provider from that answer by name (Neon, Supabase, Render, AWS RDS).",
+      "deepseek": true,
+      "deepseekReason": "All four providers appear by name in the table and text.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "last-tuesday-postgres",
+      "criterion": "For each provider, compares the earlier price to the current price (both stated).",
+      "deepseek": true,
+      "deepseekReason": "The table gives 'Then (3 Nov)' and 'Now (10 Nov 2026)' prices for all four providers.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "last-tuesday-postgres",
+      "criterion": "Cites current sources with [n] markers.",
+      "deepseek": true,
+      "deepseekReason": "The answer includes bracketed markers such as [4][15][16][6][22].",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "last-tuesday-postgres",
+      "criterion": "Gives a clear verdict up front (for example, which prices changed and which did not).",
+      "deepseek": true,
+      "deepseekReason": "It opens with 'No \u2014 none of the four changed in price since Tue 3 Nov 2026.'",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist",
+      "criterion": "Names all five tools from the shortlist (HubSpot Sales Hub, Pipedrive, Salesforce Starter Suite, Zoho CRM, Close).",
+      "deepseek": true,
+      "deepseekReason": "The table lists all five: HubSpot Sales Hub, Pipedrive, Salesforce Starter Suite, Zoho CRM, and Close.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist",
+      "criterion": "For each tool, says whether its pricing changed since 9 November 2026 and whether anything notable shipped since then.",
+      "deepseek": true,
+      "deepseekReason": "Each row gives a pricing status and the shipping section covers each tool, including 'nothing product-level' for Zoho.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist",
+      "criterion": "Its searches are restricted to recent news or official pages (queries use an after date or a site restriction).",
+      "deepseek": true,
+      "deepseekReason": "All listed queries use either a site: restriction or an after:2026-11-09 date.",
+      "claude": false,
+      "claudeReason": "One of 14 queries (\"Pipedrive launches new AI features announcement November 2026\") has neither a site nor an after date."
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist",
+      "criterion": "Cites sources with [n] markers.",
+      "deepseek": true,
+      "deepseekReason": "The answer includes bracketed numeric citations such as [6][8], [13][29], and [1].",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist",
+      "criterion": "Is scannable: a table or one line per tool.",
+      "deepseek": true,
+      "deepseekReason": "A per-tool table plus a bulleted shipping section makes it scannable.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "fresh-fact",
+      "criterion": "Gives a specific version number.",
+      "deepseek": true,
+      "deepseekReason": "The answer states Node.js 26.13.0 as the latest stable release.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "fresh-fact",
+      "criterion": "Cites a source with an [n] marker.",
+      "deepseek": true,
+      "deepseekReason": "The answer includes multiple bracketed citation markers such as [16][17][18].",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "fresh-fact",
+      "criterion": "Mentions a date (when the release was made, or when the answer was current).",
+      "deepseek": true,
+      "deepseekReason": "It gives the release date 28 Oct 2026 and states the answer is current as of 10 Nov 2026.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "no-search-needed",
+      "criterion": "Gives a professional rewrite of the sentence (it keeps the Friday deadline and the stakes).",
+      "deepseek": true,
+      "deepseekReason": "The rewrite keeps the Friday deadline and conveys the stakes as risk of missing the deadline.",
+      "claude": false,
+      "claudeReason": "\"Otherwise, we risk missing our deadline\" restates the deadline; the stakes in \"we're toast\" are gone."
+    },
+    {
+      "run": "low-2",
+      "scenario": "no-search-needed",
+      "criterion": "Is brief: the rewrite, plus at most one short sentence of commentary.",
+      "deepseek": true,
+      "deepseekReason": "The answer is the rewrite plus one short sentence of commentary about the date.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "follow-up",
+      "criterion": "Answers in about one sentence.",
+      "deepseek": true,
+      "deepseekReason": "The answer is a single sentence.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "follow-up",
+      "criterion": "Is consistent with the first answer about Neon and Supabase free tiers (it picks one of the two that the first answer supports).",
+      "deepseek": true,
+      "deepseekReason": "It picks Supabase and justifies it with the full-stack features the first answer described, while noting the 500 MB and weekly pause.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "follow-up",
+      "criterion": "Does not run an unnecessary new search for this follow-up.",
+      "deepseek": true,
+      "deepseekReason": "The search queries section shows no searches were run for this message.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "reason-capacity",
+      "criterion": "Gets 7 cores at peak: 50 requests a second \u00d7 0.08 s = 4 busy cores, divided by 0.6 = 6.7, rounded up to 7.",
+      "deepseek": true,
+      "deepseekReason": "It states 7 cores, shows 50 req/s \u00d7 0.08 s = 4 cores, 4/0.6 = 6.67, rounded to 7.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "reason-capacity",
+      "criterion": "Leads with the number, and keeps the working short and readable (no LaTeX such as \\boxed).",
+      "deepseek": true,
+      "deepseekReason": "It opens with '7 cores' and the arithmetic is brief plain text with no LaTeX.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "reason-capacity",
+      "criterion": "Gives a reasoned view on the 60% target versus the 200 ms p99, such as headroom for bursts and queueing as utilisation rises.",
+      "deepseek": true,
+      "deepseekReason": "It discusses queueing at 57% utilisation, p99 margin, burst headroom, and recommends a 50% target.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "reason-tiers",
+      "criterion": "Gets 610,000 events a month: 0.5 \u00d7 (N \u2212 10) = 300 gives N = 610 thousand.",
+      "deepseek": true,
+      "deepseekReason": "The answer states Plan B becomes cheaper above 610,000 events and shows the matching calculation.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "reason-tiers",
+      "criterion": "Says Plan B stays cheaper above 1 million events too, since its overage rate is lower.",
+      "deepseek": true,
+      "deepseekReason": "It explicitly says B stays ahead beyond 1M because the $0.20 marginal rate is lower than $0.50.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "reason-tiers",
+      "criterion": "Leads with the answer, and keeps the working short and readable (no LaTeX such as \\boxed).",
+      "deepseek": true,
+      "deepseekReason": "It opens with the answer and gives brief plain-text working with no LaTeX.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "tradeoff-advice",
+      "criterion": "Picks a first change and justifies it with their constraints (for example moving Postgres off the box, or zero-downtime deploys behind a load balancer).",
+      "deepseek": true,
+      "deepseekReason": "It picks two app instances behind a load balancer plus managed Postgres and justifies it as fixing deploy downtime and single point of failure.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "tradeoff-advice",
+      "criterion": "Gives an order for the next steps rather than an unranked list of options.",
+      "deepseek": true,
+      "deepseekReason": "It presents a numbered 'Do first, roughly in this order' sequence from measurement through to background jobs and CDN.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "tradeoff-advice",
+      "criterion": "Names things not to do yet (for example microservices or Kubernetes) and says why, for a team of four.",
+      "deepseek": true,
+      "deepseekReason": "It lists microservices, Kubernetes, sharding, self-managed HA and rewrites with reasons tied to four engineers and coordination cost.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "tradeoff-advice",
+      "criterion": "Is concrete enough to act on: names specific techniques or services.",
+      "deepseek": true,
+      "deepseekReason": "It names RDS/Cloud SQL, PgBouncer, Celery/RQ, S3+CDN, Redis, expand/contract migrations and health checks.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "broad-compare",
+      "criterion": "States each provider's free bandwidth allowance (or that it has none), each with a citation.",
+      "deepseek": true,
+      "deepseekReason": "The table gives Cloudflare unlimited [10][13], Vercel 100 GB [3][7][9], and Netlify 300 credits/~15 GB [15][19], each cited.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "broad-compare",
+      "criterion": "Says which of the three fits 200 GB a month on the free tier.",
+      "deepseek": true,
+      "deepseekReason": "It states Cloudflare Pages is the only one where 200 GB/month is comfortably free.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "broad-compare",
+      "criterion": "For each provider, says what happens past the limit (charged, paused, or must upgrade).",
+      "deepseek": true,
+      "deepseekReason": "It covers Cloudflare (builds blocked), Vercel (feature off, wait 30 days, site may go offline), and Netlify (projects paused).",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "broad-compare",
+      "criterion": "Gives a clear verdict up front.",
+      "deepseek": true,
+      "deepseekReason": "The opening line names Cloudflare Pages by a wide margin as the answer.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "vague-it",
+      "criterion": "Covers both Neon and Supabase, or says which one it takes \"it\" to mean and why.",
+      "deepseek": true,
+      "deepseekReason": "The answer explicitly addresses both Neon and Supabase with separate sections.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "vague-it",
+      "criterion": "For each one covered, says what happens past the free limits (for example paused, throttled, or billed).",
+      "deepseek": true,
+      "deepseekReason": "It describes Neon suspending compute/blocking writes and Supabase restricting the project with HTTP 402, plus pausing.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "vague-it",
+      "criterion": "Answers rather than only asking a clarifying question.",
+      "deepseek": true,
+      "deepseekReason": "It gives a direct answer ('Yes \u2014 on both...') without asking a clarifying question.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist-paraphrase",
+      "criterion": "Names all five tools from the shortlist (HubSpot Sales Hub, Pipedrive, Salesforce Starter Suite, Zoho CRM, Close).",
+      "deepseek": true,
+      "deepseekReason": "The table lists all five: HubSpot Sales Hub Professional, Pipedrive, Salesforce Starter Suite, Zoho CRM Professional, and Close Growth.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist-paraphrase",
+      "criterion": "For each tool, says whether its pricing changed since 9 November 2026 and whether anything notable shipped since then.",
+      "deepseek": true,
+      "deepseekReason": "Each row gives a status (unchanged/name wrong) and the answer notes no vendor announcements after 9 Nov, plus Close's Chloe AI beta.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist-paraphrase",
+      "criterion": "Its searches are restricted to recent news or official pages (queries use an after date or a site restriction).",
+      "deepseek": true,
+      "deepseekReason": "Queries use site: restrictions on official vendor domains and an after:2026-11-09 date filter.",
+      "claude": false,
+      "claudeReason": "Three of 9 queries in step 2 have neither a site nor an after date."
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist-paraphrase",
+      "criterion": "Cites sources with [n] markers.",
+      "deepseek": true,
+      "deepseekReason": "The answer includes bracketed numeric citations such as [8][12], [21][24], [3][6].",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "crm-shortlist-paraphrase",
+      "criterion": "Is scannable: a table or one line per tool.",
+      "deepseek": true,
+      "deepseekReason": "The answer presents a table with one row per tool.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date-paraphrase",
+      "criterion": "Restates the 3 November question accurately (managed Postgres hosting for a small production app, entry paid plans).",
+      "deepseek": true,
+      "deepseekReason": "It says they compared entry paid managed Postgres plans for the four providers, matching the original question.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date-paraphrase",
+      "criterion": "Re-checks the earlier claims against current sources rather than simply repeating the old answer.",
+      "deepseek": true,
+      "deepseekReason": "It reports re-checking today and revises the Render and Neon figures rather than repeating them.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date-paraphrase",
+      "criterion": "For each provider (Neon, Supabase, Render, AWS RDS), says whether its price still holds, changed (old -> new), or could not be verified.",
+      "deepseek": true,
+      "deepseekReason": "The table gives a status for all four: Neon changed/corrected, Supabase unchanged, Render changed/was wrong, AWS unchanged.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date-paraphrase",
+      "criterion": "Cites sources with [n] markers.",
+      "deepseek": true,
+      "deepseekReason": "The answer includes bracketed numeric citations such as [15], [11], [20].",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "recall-by-date-paraphrase",
+      "criterion": "Uses absolute dates (for example 3 November 2026), not only \"last week\" or \"today\".",
+      "deepseek": true,
+      "deepseekReason": "It uses absolute dates like 3 Nov 2026 and 10 Nov 2026 in the table.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "control-recalled-fact",
+      "criterion": "Reports the version from the 3 November answer: Node.js 26.12.1.",
+      "deepseek": true,
+      "deepseekReason": "The answer states the latest stable release was Node.js 26.12.1.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "low-2",
+      "scenario": "control-recalled-fact",
+      "criterion": "Dates it: says this was the answer on 3 November 2026.",
+      "deepseek": false,
+      "deepseekReason": "It refers to 'when we talked' implicitly but never states the date 3 November 2026.",
+      "claude": false,
+      "claudeReason": "Never says the answer was given on 3 November 2026."
+    },
+    {
+      "run": "low-2",
+      "scenario": "control-recalled-fact",
+      "criterion": "Does not present 26.12.1 as the current version without saying it may have changed.",
+      "deepseek": true,
+      "deepseekReason": "It notes the info is a week old and offers to check whether a newer release has landed.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "off-1",
+      "scenario": "reason-capacity",
+      "criterion": "Gets 7 cores at peak: 50 requests a second \u00d7 0.08 s = 4 busy cores, divided by 0.6 = 6.7, rounded up to 7.",
+      "deepseek": true,
+      "deepseekReason": "The answer states \u22486.7 cores, so 7 cores, with the correct 50 req/s \u00d7 0.08 = 4 cores \u00f7 0.60 working.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "off-1",
+      "scenario": "reason-capacity",
+      "criterion": "Leads with the number, and keeps the working short and readable (no LaTeX such as \\boxed).",
+      "deepseek": false,
+      "deepseekReason": "It opens with a wrong '67 cores' figure and a visible self-correction, so the working is muddled rather than short and clean.",
+      "claude": false,
+      "claudeReason": "Opens with \"About 67 cores\" and corrects itself in the text."
+    },
+    {
+      "run": "off-1",
+      "scenario": "reason-capacity",
+      "criterion": "Gives a reasoned view on the 60% target versus the 200 ms p99, such as headroom for bursts and queueing as utilisation rises.",
+      "deepseek": true,
+      "deepseekReason": "It discusses non-linear queueing at 60% utilisation, autoscaler lag and burst headroom, and recommends 40\u201350%.",
+      "claude": true,
+      "claudeReason": null
+    },
+    {
+      "run": "off-1",
+      "scenario": "reason-tiers",
+      "criterion": "Gets 610,000 events a month: 0.5 \u00d7 (N \u2212 10) = 300 gives N = 610 thousand.",
+      "deepseek": true,
+      "deepseekReason": "The answer states the exact crossover is 610,000 events and shows 0.0005 \u00d7 (v \u2212 10,000) = 300 \u2192 v = 610,000.",
+      "claude": false,
+      "claudeReason": "The headline says 700,000; only the working reaches 610,000, so the answer contradicts itself."
+    },
+    {
+      "run": "off-1",
+      "scenario": "reason-tiers",
+      "criterion": "Says Plan B stays cheaper above 1 million events too, since its overage rate is lower.",
+      "deepseek": false,
+      "deepseekReason": "It only says the 1M threshold and overage rate never come into play; it does not state Plan B remains cheaper above 1M.",
+      "claude": false,
+      "claudeReason": "Says the 1M threshold \"never comes into play\" instead of saying B stays cheaper above it."
+    },
+    {
+      "run": "off-1",
+      "scenario": "reason-tiers",
+      "criterion": "Leads with the answer, and keeps the working short and readable (no LaTeX such as \\boxed).",
+      "deepseek": true,
+      "deepseekReason": "It opens with the answer and gives brief bullet working with no LaTeX.",
+      "claude": false,
+      "claudeReason": "Leads with the wrong number."
+    }
+  ]
+}

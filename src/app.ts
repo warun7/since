@@ -78,6 +78,10 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
     return c.json({ ok: true });
   });
 
+  // Example history runs three agent turns, which takes a while. A question asked meanwhile
+  // waits for it: recall would otherwise find an empty memory and answer "no record".
+  let seeding: Promise<Response> | null = null;
+
   app.post('/api/chat', async (c) => {
     const body = ((await c.req.json().catch(() => null)) ?? {}) as ChatBody;
     const message = chatMessage(body);
@@ -97,6 +101,12 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
         writes = writes.then(() => (stream.aborted ? undefined : stream.writeSSE({ data: JSON.stringify(e) })));
       };
       try {
+        if (seeding) {
+          emit({ type: 'status', text: 'Finishing the example history…' });
+          await seeding.catch(() => undefined);
+          emit({ type: 'status', text: '' });
+          if (abort.signal.aborted) return;
+        }
         await runTurn(
           {
             conversationId: typeof body.conversationId === 'string' ? body.conversationId || undefined : undefined,
@@ -116,7 +126,6 @@ export function createApi({ store, questionsPerDay, admit }: ApiOptions): Hono {
 
   // Example history, so the memory questions can be tried at once. Only into an empty memory,
   // and only once at a time: a double click must not seed twice.
-  let seeding: Promise<Response> | null = null;
   app.post('/api/example-history', async (c) => {
     const body = ((await c.req.json().catch(() => null)) ?? {}) as { tz?: string };
     if (seeding || store.firstTurnAt()) return c.json({ error: 'Example history can only be added to an empty memory.' }, 409);

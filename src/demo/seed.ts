@@ -56,7 +56,8 @@ export async function seedDemoHistory(store: MemoryStore, opts: { tz: string; no
       let sources = 0;
       try {
         const result = await runTurn(
-          { message: seed.question, clock: { now: seed.at, tz: opts.tz } },
+          // Thinking off: the history is setup for the questions that follow, and someone is waiting for it.
+          { message: seed.question, clock: { now: seed.at, tz: opts.tz }, effort: 'off' },
           (e) => {
             if (e.type === 'done') sources = e.sources.length;
           },

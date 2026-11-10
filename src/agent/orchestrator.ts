@@ -91,7 +91,7 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   ];
 
   // ── the loop: stream a step; if it calls web_search, run the searches and go again ──
-  const mode = config.reasoningEffort;
+  const mode = input.effort ?? config.reasoningEffort;
   let searchRounds = 0;
   let thinkingMs = 0;
   const trace: TurnTrace = {

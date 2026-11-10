@@ -6,6 +6,14 @@ import { DateTime } from 'luxon';
 import type { Clock, TimeRef } from '../types.js';
 
 const WEEKDAY = '(monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
+/**
+ * Full names and the short forms people type ("last Tues", "on Thurs"). Short forms are only
+ * read after "last", "on" or "this past": on their own, "sat" and "sun" are words.
+ */
+const WEEKDAY_ANY = '(mon(?:day)?|tue(?:s(?:day)?)?|wed(?:s|nesday)?|thu(?:r(?:s(?:day)?)?)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?)';
+const MONTH_NAME = '(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)';
+/** Zones whose people write the month first (3/11 is 11 March). Everywhere else it's the day. */
+const MONTH_FIRST_ZONES = /^(?:America\/(?:New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Juneau|Sitka|Nome|Yakutat|Adak|Metlakatla|Menominee|Indiana\/|Kentucky\/|North_Dakota\/)|Pacific\/Honolulu|Asia\/Manila)/;
 const MONTH = '(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\b';
 /** Words that make "the 3rd …" an item in a list rather than a day. */
 const ORDINAL_NOUN = '(?:option|one|item|choice|pick|place|point|time|tool|answer|question|row|step|plan|tier|result|link|source|line|attempt)s?\\b';
@@ -75,9 +83,19 @@ function spanRef(text: string, span: Span, alternates?: Span[]): TimeRef {
   return ref;
 }
 
-/** Weekday numbers follow luxon: 1 = Monday ... 7 = Sunday. */
+/** Weekday numbers follow luxon: 1 = Monday ... 7 = Sunday. Short forms count ("Tues"). */
 function weekdayNumber(name: string): number {
-  return WEEKDAY.slice(1, -1).split('|').indexOf(name.toLowerCase()) + 1;
+  return ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].indexOf(name.slice(0, 3).toLowerCase()) + 1;
+}
+
+function monthNumber(name: string): number {
+  return ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].indexOf(name.slice(0, 3).toLowerCase()) + 1;
+}
+
+/** A span cut to end at `today`, or null when it starts after today (memory holds only the past). */
+function pastPart(first: DateTime, last: DateTime, today: DateTime): Span | null {
+  if (first.toMillis() > today.toMillis()) return null;
+  return { first, last: last.toMillis() > today.toMillis() ? today : last };
 }
 
 /** The most recent date strictly before today that falls on `weekday`. Today itself counts as 7 days back. */
@@ -115,7 +133,7 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
   };
 
   // Future phrases are claimed (and dropped) first, so chrono cannot resolve them to the past.
-  scan(new RegExp(`\\b(?:next\\s+(?:week|month|${WEEKDAY})|tomorrow)\\b`, 'gi'), () => null);
+  scan(new RegExp(`\\b(?:next\\s+(?:week|weekend|month|${WEEKDAY_ANY})|tomorrow)\\b`, 'gi'), () => null);
 
   // "still correct today" asks about the present, not about a past day. Without this, a question
   // like "Is your answer still correct today?" would wrongly add a memory lookup for today.
@@ -124,6 +142,12 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
   scan(/\b(?:earlier\s+today|this\s+morning|this\s+afternoon|tonight|today)\b/gi, (m) =>
     spanRef(m[0], { first: today, last: today }),
   );
+
+  // Before "yesterday", which would otherwise claim the end of the phrase.
+  scan(/\b(?:the\s+)?day\s+before\s+yesterday\b/gi, (m) => {
+    const d = today.minus({ days: 2 });
+    return spanRef(m[0], { first: d, last: d });
+  });
 
   scan(/\byesterday\b/gi, (m) => {
     const d = today.minus({ days: 1 });
@@ -141,11 +165,34 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
     return spanRef(m[0], { first: d, last: d });
   });
 
+  // "A week ago" or "a fortnight ago" is rarely the exact day, so it reads as that day give or take three.
+  scan(/\b(?:(a|an|one|two|three|four|\d{1,2})\s+weeks?|a\s+fortnight)\s+ago\b/gi, (m) => {
+    const weeks = m[1] ? (NUMBER_WORDS[m[1].toLowerCase()] ?? Number(m[1])) : 2;
+    const centre = today.minus({ weeks });
+    const last = centre.plus({ days: 3 });
+    return spanRef(m[0], { first: centre.minus({ days: 3 }), last: last < today ? last : today.minus({ days: 1 }) });
+  });
+
+  scan(/\bthe\s+other\s+week\b/gi, (m) => spanRef(m[0], { first: today.minus({ days: 21 }), last: today.minus({ days: 7 }) }));
+
+  // The most recent Saturday and Sunday before today.
+  scan(/\b(?:last|over\s+the|this\s+past|at\s+the|on\s+the)\s+weekend\b/gi, (m) => {
+    const sunday = lastOccurrence(today, 7);
+    return spanRef(m[0], { first: sunday.minus({ days: 1 }), last: sunday });
+  });
+
   scan(/\b(?:earlier\s+)?this\s+week\b/gi, (m) => spanRef(m[0], { first: thisMonday, last: today }));
 
   scan(/\blast\s+week\b/gi, (m) =>
     spanRef(m[0], { first: thisMonday.minus({ weeks: 1 }), last: thisMonday.minus({ days: 1 }) }),
   );
+
+  // Before "this month" and "last month", which would otherwise claim the end of the phrase.
+  scan(/\b(?:at\s+)?the\s+(?:start|beginning)\s+of\s+(the|this|last)\s+month\b/gi, (m) => {
+    const start = m[1]!.toLowerCase() === 'last' ? today.startOf('month').minus({ months: 1 }) : today.startOf('month');
+    const past = pastPart(start, start.set({ day: 10 }), today);
+    return past ? spanRef(m[0], past) : null;
+  });
 
   scan(/\b(?:earlier\s+)?this\s+month\b/gi, (m) =>
     spanRef(m[0], { first: today.startOf('month'), last: today }),
@@ -156,7 +203,7 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
     return spanRef(m[0], { first: firstOfThis.minus({ months: 1 }), last: firstOfThis.minus({ days: 1 }) });
   });
 
-  scan(new RegExp(`\\blast\\s+${WEEKDAY}\\b`, 'gi'), (m) => {
+  scan(new RegExp(`\\blast\\s+${WEEKDAY_ANY}\\b`, 'gi'), (m) => {
     const day = lastOccurrence(today, weekdayNumber(m[1]));
     // "Last Tuesday" said on a Thursday is most likely this week's Tuesday, but the user may
     // mean the one a week before, so both readings are kept and recall picks the one with evidence.
@@ -164,8 +211,8 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
     return spanRef(m[0], { first: day, last: day }, sameWeek ? [{ first: day.minus({ weeks: 1 }), last: day.minus({ weeks: 1 }) }] : undefined);
   });
 
-  scan(new RegExp(`\\b(?:on\\s+)?${WEEKDAY}\\b`, 'gi'), (m) => {
-    const wd = weekdayNumber(m[1]);
+  scan(new RegExp(`\\b(?:(?:on|this\\s+past)\\s+${WEEKDAY_ANY}|${WEEKDAY})\\b`, 'gi'), (m) => {
+    const wd = weekdayNumber(m[1] ?? m[2]!);
     const day = lastOccurrence(today, wd);
     // A bare weekday that is today reads as a week back, and as today itself as well.
     const alternates = wd === today.weekday ? [{ first: today, last: today }] : undefined;
@@ -189,6 +236,49 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
     },
   );
 
+  // A month with no day: "in October", "back in March 2026", "early November". Early, mid and
+  // late are the month's thirds. A month still to come this year is last year's.
+  const monthRef = (m: RegExpMatchArray | RegExpExecArray, part: string | undefined, name: string, year: string | undefined): TimeRef | null => {
+    const month = monthNumber(name);
+    const from = part?.toLowerCase() === 'mid' ? 11 : part?.toLowerCase() === 'late' ? 21 : 1;
+    const span = (y: number) => {
+      const start = DateTime.fromObject({ year: y, month, day: 1 }, { zone }).startOf('day');
+      const to = part?.toLowerCase() === 'early' ? 10 : part?.toLowerCase() === 'mid' ? 20 : start.daysInMonth!;
+      return { first: start.set({ day: from }), last: start.set({ day: to }) };
+    };
+    let s = span(year ? Number(year) : today.year);
+    if (!year && s.first.toMillis() > today.toMillis()) s = span(today.year - 1);
+    const past = pastPart(s.first, s.last, today);
+    return past ? spanRef(m[0], past) : null;
+  };
+  const NO_DAY_AFTER = '(?:,?\\s+(\\d{4}))?\\b(?!\\s*(?:\\d|the\\s+\\d))';
+  scan(new RegExp(`\\b(?:(?:back\\s+)?in|during|over|throughout|from)\\s+(?:(early|mid|late)[-\\s]+)?${MONTH_NAME}${NO_DAY_AFTER}`, 'gi'), (m) =>
+    monthRef(m, m[1], m[2]!, m[3]),
+  );
+  scan(new RegExp(`\\b(early|mid|late)[-\\s]+${MONTH_NAME}${NO_DAY_AFTER}`, 'gi'), (m) => monthRef(m, m[1], m[2]!, m[3]));
+
+  // "On 3/11": the day first, as most of the world writes it, except where the month comes
+  // first (the US). The other reading is kept too, and recall goes with the one that has a record.
+  scan(/\b(?:on|from|since|dated)\s+(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?\b(?![/\d])/gi, (m) => {
+    const a = Number(m[1]);
+    const b = Number(m[2]);
+    const year = m[3] ? Number(m[3].length === 2 ? `20${m[3]}` : m[3]) : null;
+    const reading = (day: number, month: number): DateTime | null => {
+      const make = (y: number) => DateTime.fromObject({ year: y, month, day }, { zone }).startOf('day');
+      let d = make(year ?? today.year);
+      if (!d.isValid) return null;
+      if (year === null && d.toMillis() > today.toMillis()) d = make(today.year - 1);
+      return d.isValid && d.toMillis() <= today.toMillis() ? d : null;
+    };
+    const dayFirst = reading(a, b);
+    const monthFirst = reading(b, a);
+    const [primary, other] = MONTH_FIRST_ZONES.test(zone) ? [monthFirst, dayFirst] : [dayFirst, monthFirst];
+    const main = primary ?? other;
+    if (!main) return null;
+    const alt = primary && other && !other.hasSame(primary, 'day') ? [{ first: other, last: other }] : undefined;
+    return spanRef(m[0], { first: main, last: main }, alt);
+  });
+
   // Anything chrono finds that the rules above did not claim: "3 November", "12 Mar 2026",
   // "3 to 5 November". Chrono does not know the user's timezone, so the offset is passed in.
   const offsetMinutes = DateTime.fromJSDate(clock.now, { zone }).offset ?? 0;
@@ -197,6 +287,9 @@ export function resolveTimeRefs(text: string, clock: Clock): TimeRef[] {
     const s = r.start;
     // Times without a day ("at 3pm") are not date references.
     if (!s.isCertain('day')) continue;
+    // A bare "3/4" is more often a fraction than a date, and chrono reads it month first. Dates
+    // written this way after "on" or "since" were read above, the user's way round.
+    if (/^\d{1,2}\/\d{1,2}$/.test(r.text.trim())) continue;
 
     const dayOf = (c: typeof s, year: number | null): DateTime => {
       const month = c.get('month');

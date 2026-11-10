@@ -216,4 +216,6 @@ export interface TurnInput {
   message: string;
   clock: Clock;
   signal?: AbortSignal;
+  /** Overrides REASONING_EFFORT for this turn. Example history uses off: it is setup, and someone is waiting. */
+  effort?: 'off' | 'low';
 }
