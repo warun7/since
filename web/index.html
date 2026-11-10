@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>since</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Conversations">
+      <div class="brand">
+        <div class="brand-name">since</div>
+        <div class="tagline">remembers what it told you</div>
+      </div>
+      <button type="button" class="new-chat" id="new-chat">New chat</button>
+      <nav class="conv-list" id="conv-list" aria-label="Conversation history"></nav>
+    </aside>
+
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button type="button" class="menu-btn" id="menu-btn" aria-label="Show conversations" aria-controls="sidebar" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <h1 class="title" id="title">New chat</h1>
+      </header>
+
+      <div class="thread" id="thread">
+        <div class="thread-inner" id="thread-inner"></div>
+      </div>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="composer-box">
+          <textarea class="composer-input" id="input" rows="1" placeholder="Ask anything" aria-label="Message" enterkeyhint="send"></textarea>
+          <button type="submit" class="send-btn" id="send-btn" aria-label="Send message">Send</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</body>
+</html>

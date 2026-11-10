@@ -1,0 +1,36 @@
+{
+  "name": "since",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A chat agent with web search that remembers what it told you and checks what changed since.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/server.ts",
+    "start": "tsx src/server.ts",
+    "chat": "tsx src/cli.ts",
+    "seed": "tsx scripts/seed-demo.ts",
+    "eval": "tsx evals/run.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.6",
+    "better-sqlite3": "^13.0.3",
+    "chrono-node": "^2.10.3",
+    "dompurify": "^3.4.17",
+    "dotenv": "^18.0.10",
+    "hono": "^4.13.17",
+    "luxon": "^3.7.2",
+    "marked": "^18.2.0",
+    "openai": "^7.55.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "*",
+    "@types/luxon": "*",
+    "@types/node": "*",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
