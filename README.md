@@ -4,7 +4,7 @@ A chat agent with one tool, web search, that remembers what it told you and chec
 
 Ask it "Last Tuesday I asked you about Postgres hosting. Has any pricing changed since then?" and it works out which Tuesday you mean, finds that conversation, lists the prices it quoted then, re-checks each one against the vendors' pages and recent news, and tells you what moved, with sources.
 
-**Try it:** https://since.varun-g-ug23.workers.dev. Each visitor gets their own memory. To try the memory questions, click **Add example history** first.
+**Try it:** https://since.varunsg.com. Each visitor gets their own memory. To try the memory questions, click **Add example history** first.
 
 How it's built, and why: [DESIGN.md](DESIGN.md).
 
@@ -48,6 +48,8 @@ npm run typecheck
 ## Hosting
 
 The live demo runs on Cloudflare, from [`cloud/`](cloud/). The code is the same as `npm run dev`; only the storage and the entry point change. A Worker gives each visitor an id in a cookie and forwards their API calls to that visitor's own Durable Object. The Durable Object holds the visitor's memory in its built-in SQLite, behind the same `MemoryStore` as the local SQLite file. Each visitor gets 40 questions a day, and the whole site 1,500.
+
+`since.varunsg.com` is a tiny Cloudflare Pages site ([`cloud/pages/_worker.js`](cloud/pages/_worker.js)) that passes every request to the Worker. The domain's DNS is at Hostinger, and a Pages site can take a domain by CNAME where a Worker can't.
 
 To deploy your own (needs a Cloudflare account; `cloud/` has its own dependencies, so the root install stays small):
 
