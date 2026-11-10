@@ -421,7 +421,9 @@ function setHeader(text) {
 
 /** Copies text and confirms on the button itself, so nothing else on screen moves. */
 async function copyText(text, button) {
-  const label = button.textContent;
+  // The label is kept from the first click: read on a second click, it would be "Copied" for good.
+  button.dataset.label ??= button.textContent;
+  clearTimeout(Number(button.dataset.timer));
   try {
     await navigator.clipboard.writeText(text);
     button.textContent = 'Copied';
@@ -429,9 +431,11 @@ async function copyText(text, button) {
     // No clipboard permission (or an insecure context): say so rather than fail silently.
     button.textContent = 'Select to copy';
   }
-  setTimeout(() => {
-    button.textContent = label;
-  }, 1400);
+  button.dataset.timer = String(
+    setTimeout(() => {
+      button.textContent = button.dataset.label;
+    }, 1400),
+  );
 }
 
 /** Puts a past message back in the composer, so it can be sent again with changes. */
