@@ -38,4 +38,6 @@ npx tsx evals/compare.ts evals/results/<run-off> evals/results/<run-low>
 npx tsx evals/compare.ts evals/effort/off-1 evals/effort/off-2 evals/effort/low-1 evals/effort/low-2   # these runs
 ```
 
+Note: the rubric gained one line after these runs — `recall-by-date` now also checks that a value it could not find in the retrieved text is reported as *could not verify* rather than *removed*. A new run is not directly comparable to the scores above.
+
 Answers change from run to run, because the model and the web do. With two runs an arm, a single-run difference on one scenario is noise. The reasoning-question misses at off were not: they happened in both runs.

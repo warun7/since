@@ -12,3 +12,7 @@ cloud/.assets/
 cloud/.cloudflare/
 .cloudflare/
 .dev.vars*
+
+# demo recording workspace (scripts/record-demo.mjs)
+.demo/
+.playwright/

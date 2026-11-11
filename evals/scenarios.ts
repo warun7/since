@@ -147,6 +147,7 @@ export const scenarios: Scenario[] = [
       'For each provider (Neon, Supabase, Render, AWS RDS), says whether its price still holds, changed (old -> new), or could not be verified.',
       'Cites sources with [n] markers.',
       'Uses absolute dates (for example 3 November 2026), not only "last week" or "today".',
+      'A value it could not find in the retrieved text is reported as could not verify, not as removed.',
     ],
   },
   {

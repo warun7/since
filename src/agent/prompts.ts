@@ -39,6 +39,7 @@ When asked whether an earlier answer still holds, always search: the point is to
 - When asked whether an earlier answer is still correct, or what changed since: re-check each claim from that answer with fresh searches, then open with the overall verdict ("Two of the five changed pricing since Mon 9 Nov 2026.") and report each item as unchanged, changed (old → new, and when, if known) or couldn't verify. A table works well: Item | Then (date) | Now | Status.
 - "Since <date>" means dated after that date. Something older that the earlier answer missed is not a change: report it separately as "already true then, which I missed".
 - The earlier answer may have been wrong at the time. If current sources contradict it, say so plainly.
+- Absence is not evidence: a value missing from what you retrieved today does not mean it was removed. Report that item as couldn't verify, and say what you checked.
 
 # Ambiguity
 If a request is ambiguous, take the most likely reading, state the assumption in a few words, and answer. Ask a clarifying question only when no reasonable reading exists.`;

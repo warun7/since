@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DeepSeekSearch, buildQuery } from '../src/search/deepseek.js';
 import { formatResultsForModel, webSearch } from '../src/search/index.js';
-import { queryTerms, selectPassages } from '../src/search/passages.js';
+import { queryTerms, selectPassages, tokenize } from '../src/search/passages.js';
 import { canonicalUrl, mergeAndRank } from '../src/search/rank.js';
 import { SourceRegistry } from '../src/search/registry.js';
 import type { RawResult, SearchProvider, SearchQuery, Source } from '../src/types.js';
@@ -64,6 +64,46 @@ describe('mergeAndRank', () => {
       hit('https://d.com/1', q, 3, { rerankScore: 1.8 }),
     ]);
     expect(enoughGood.map((r) => r.url)).not.toContain('https://a.com/1');
+  });
+});
+
+describe('tokenize', () => {
+  it('splits scripts the letter-only regex cannot: no spaces, or combining marks', () => {
+    // A whole Chinese phrase used to be one token, and Hindi vowel marks were dropped.
+    expect(tokenize('Neon 的价格是多少')).toContain('价格');
+    expect(tokenize('नियॉन की कीमत क्या है')).toContain('कीमत');
+  });
+
+  it('leaves English, money and version tokens exactly as they were', () => {
+    expect(tokenize('Neon Launch plan price per month')).toEqual(['neon', 'launch', 'plan', 'price', 'per', 'month']);
+    expect(tokenize('$19 per month')).toEqual(['$19', 'per', 'month']);
+    expect(tokenize('Node.js 26.13.1')).toEqual(['node', 'js', '26.13.1']);
+  });
+
+  it('keeps a currency symbol with its number in a segmented script', () => {
+    expect(tokenize('€5,000 的价格')).toContain('€5,000');
+  });
+});
+
+describe('a failing provider', () => {
+  it('degrades to "no results" instead of throwing, and hides the upstream message from the model', async () => {
+    const failing: SearchProvider = {
+      name: 'failing',
+      search: async () => {
+        throw new Error('upstream down');
+      },
+    };
+    const outcome = await webSearch([{ q: 'hetzner pricing' }], {
+      question: 'What does Hetzner cost?',
+      registry: new SourceRegistry(),
+      provider: failing,
+    });
+    expect(outcome.sources).toEqual([]);
+    expect(outcome.perQuery[0]?.error).toContain('upstream down');
+    const text = formatResultsForModel(outcome);
+    expect(text).toContain('No results found');
+    expect(text).toContain('(search failed)');
+    expect(text).not.toContain('upstream down');
   });
 });
 

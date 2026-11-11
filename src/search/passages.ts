@@ -21,8 +21,33 @@ const SHORT_DOC_CHARS = 400;
 const K1 = 1.2;
 const B = 0.75;
 
+/**
+ * Scripts the letter-only regex cannot tokenise: CJK writes without spaces, so a whole phrase
+ * became one token ("的价格是多少"), and Indic, Arabic and Hebrew text carries combining marks
+ * the regex drops (Hindi "कीमत" came out as "मत"). Those go through Intl.Segmenter; everything
+ * else keeps the regex, so English and numeric tokens are unchanged and old runs stay comparable.
+ */
+const NEEDS_SEGMENTER =
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Thai}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Arabic}\p{Script=Hebrew}]/u;
+const SEGMENTER = new Intl.Segmenter(undefined, { granularity: 'word' });
+const CURRENCY_SYMBOL = /^[$€£¥]$/;
+const keeps = (t: string): boolean => (t.length > 1 || /\d/.test(t)) && !STOPWORDS.has(t);
+
 export function tokenize(text: string): string[] {
-  return (text.toLowerCase().match(TOKEN) ?? []).filter((t) => (t.length > 1 || /\d/.test(t)) && !STOPWORDS.has(t));
+  const lower = text.toLowerCase();
+  if (!NEEDS_SEGMENTER.test(lower)) return (lower.match(TOKEN) ?? []).filter(keeps);
+  const words: string[] = [];
+  let currency = '';
+  for (const part of SEGMENTER.segment(lower)) {
+    if (!part.isWordLike) {
+      // "€5,000" is one figure: the symbol is not word-like on its own, so it is carried over.
+      currency = CURRENCY_SYMBOL.test(part.segment) ? part.segment : '';
+      continue;
+    }
+    words.push(currency + part.segment);
+    currency = '';
+  }
+  return words.filter(keeps);
 }
 
 /** Unique search terms from every query and the user's question, with operators removed. */

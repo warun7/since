@@ -1,0 +1,2330 @@
+[
+  {
+    "id": "neon-pricing",
+    "queries": [
+      {
+        "q": "pricing plans",
+        "site": "neon.tech"
+      },
+      {
+        "q": "Neon Launch plan price 2026"
+      }
+    ],
+    "hosts": [
+      "neon.com",
+      "neon.tech"
+    ],
+    "results": [
+      {
+        "url": "https://neon.tech/partners#partners-apply",
+        "title": "Accelerate your business with Neon partnership \u2014 Neon",
+        "siteName": "Neon Postgres",
+        "authority": 3,
+        "rerankScore": 0.5984085202217102,
+        "query": {
+          "q": "pricing plans",
+          "site": "neon.tech"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://community.neon.tech/t/pricing-doesnt-seem-competitive/542/8",
+        "title": "Pricing doesn't seem competitive",
+        "siteName": "Neon Postgres",
+        "date": "2024-04-25T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 0.3901677429676056,
+        "query": {
+          "q": "pricing plans",
+          "site": "neon.tech"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://neon.tech/startups",
+        "title": "Neon Startup Deal",
+        "siteName": "Neon Postgres",
+        "authority": 3,
+        "rerankScore": 0.29866984486579895,
+        "query": {
+          "q": "pricing plans",
+          "site": "neon.tech"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://community.neon.tech/t/understanding-compute-time-pricing-rate/1115/2",
+        "title": "Understanding compute time pricing rate",
+        "siteName": "Neon Postgres",
+        "date": "2023-09-06T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 0.12930329144001007,
+        "query": {
+          "q": "pricing plans",
+          "site": "neon.tech"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://neon.tech/use-cases/ai-agents",
+        "title": "Postgres for AI Agents",
+        "siteName": "Neon Postgres",
+        "date": "2024-10-08T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 0.08502767235040665,
+        "query": {
+          "q": "pricing plans",
+          "site": "neon.tech"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://neon.com/pricing.md",
+        "title": "",
+        "siteName": "Neon Postgres",
+        "date": "2026-10-30T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 2.648479461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://neon.com/faqs/postgres-providers-multiple-apps-separate-databases-under-10",
+        "title": "Which Postgres providers let you run multiple apps with separate databases for under $10 per month total? - Neon FAQs",
+        "siteName": "Neon Postgres",
+        "date": "2026-04-24T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 2.414104461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/neondatabase/website/main/content/docs/introduction/plans.md#1",
+        "title": "title: Neon plans - title: Neon plans",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 2.351604461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://neon.com/faqs/cheapest-ways-run-postgres-database-low-traffic",
+        "title": "What are the cheapest ways to run a Postgres database for a project that gets very little traffic? - Neon FAQs",
+        "siteName": "Neon Postgres",
+        "date": "2026-04-24T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 2.351604461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/neondatabase/website/blob/eccac8ef4d05fa75bb8bef059202165652323574/public/pricing.md",
+        "title": "Neon Pricing Plans",
+        "siteName": "GitHub",
+        "date": "2026-11-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.289104461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/neondatabase/website/blob/6420cdb73bc86b8ab79987abf2a99f8f2aa9543b/content/guides/neon-launch-plan-vs-supabase-pro-plan.md",
+        "title": "Neon Launch vs Supabase Pro: Pricing and Features (2026)",
+        "siteName": "GitHub",
+        "date": "2026-11-07T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.164104461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/neondatabase/website/24ca6e00a03a945c510ce65cf04e4f2b48f8cf9d/content/docs/introduction/plans.md#1",
+        "title": "",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 2.085979461669922,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/neondatabase/website/refs/heads/main/content/guides/neon-launch-plan-vs-supabase-pro-plan.md#1",
+        "title": "title: 'Neon Launch vs Supabase Pro: Pricing and Features (2026)' - title: 'Neon Launch vs Supabase Pro: Pricing and Features (2026)'",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://comparedge.com/tools/neon-db/pricing#tier-launch",
+        "title": "Neon Pricing 2026: Free, Launch & Scale Plans from $15/mo",
+        "siteName": "14 Best Phind Alternatives 2026: v0 by Vercel & Cline",
+        "date": "2026-05-12T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.7032105922698977,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://ownkube.io/compare/neon-pricing-explained",
+        "title": "Neon pricing explained: CU-hours, storage, branches and real Postgres bills - Ownkube",
+        "siteName": "Ownkube",
+        "date": "2026-10-26T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.7032105922698977,
+        "query": {
+          "q": "Neon Launch plan price 2026"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "supabase-pricing",
+    "queries": [
+      {
+        "q": "pricing",
+        "site": "supabase.com"
+      }
+    ],
+    "hosts": [
+      "supabase.com"
+    ],
+    "results": [
+      {
+        "url": "https://supabase.com/kb/faqs/platform/database-only-cost",
+        "title": "How much does a database-only Supabase project cost? | Supabase Knowledge Base",
+        "siteName": "Supabase",
+        "date": "2026-10-26T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.5646584033966064,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/functions/pricing",
+        "title": "Edge Functions pricing | Supabase Docs",
+        "siteName": "Supabase",
+        "date": "2026-10-30T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.5496634244918823,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/platform/compute-and-disk#1",
+        "title": "Compute and Disk | Supabase Docs - Updated",
+        "siteName": "Supabase",
+        "date": "2026-11-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.5121760368347168,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/storage/pricing",
+        "title": "Storage pricing | Supabase Docs",
+        "siteName": "Supabase",
+        "date": "2026-11-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.497181057929993,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/pricing#1",
+        "title": "Pricing & Fees | Supabase - Predictable pricing,",
+        "siteName": "Supabase",
+        "authority": 3,
+        "rerankScore": 1.4896944761276243,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/platform/manage-your-usage/compute#1",
+        "title": "Manage Compute usage | Supabase Docs - Updated",
+        "siteName": "Supabase",
+        "date": "2026-11-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.4747653007507324,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users#1",
+        "title": "Manage Monthly Active Users usage | Supabase Docs - Updated",
+        "siteName": "Supabase",
+        "date": "2026-11-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.4747653007507324,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/realtime/pricing",
+        "title": "Realtime Pricing | Supabase Docs",
+        "siteName": "Supabase",
+        "date": "2026-11-04T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.4747653007507324,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-third-party#1",
+        "title": "Manage Monthly Active Third-Party Users usage | Supabase Docs - Manage Monthly Active Third-Party Users usage",
+        "siteName": "Supabase",
+        "date": "2026-10-30T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.45983624458313,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://supabase.com/docs/guides/platform/manage-your-usage/logs-ingest#1",
+        "title": "Manage Logs Ingest usage | Supabase Docs - Updated",
+        "siteName": "Supabase",
+        "date": "2026-11-03T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.4449070692062378,
+        "query": {
+          "q": "pricing",
+          "site": "supabase.com"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "render-postgres",
+    "queries": [
+      {
+        "q": "postgres pricing",
+        "site": "render.com"
+      }
+    ],
+    "hosts": [
+      "render.com"
+    ],
+    "results": [
+      {
+        "url": "https://render.com/articles/managed-postgresql-pricing-2026.md",
+        "title": "",
+        "siteName": "Render",
+        "date": "2026-10-27T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9413236379623413,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/managed-postgresql-pricing-2026#conclusion#1",
+        "title": "Managed PostgreSQL Pricing in 2026: A Complete Cost Guide - Migrating production infrastructure",
+        "siteName": "Render",
+        "date": "2026-10-27T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9337319135665896,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/render-postgres-vs-neon.md",
+        "title": "",
+        "siteName": "Render",
+        "date": "2026-10-14T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.7733055353164673,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/how-much-does-cloud-application-hosting-cost-for-small-businesses.md#1",
+        "title": "How much does cloud application hosting cost for small businesses - How much does cloud application hosting cost for small businesses",
+        "siteName": "Render",
+        "date": "2026-07-07T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.7187873125076294,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/render-postgres-vs-neon.md#1",
+        "title": "Render Postgres vs Neon - Render Postgres vs Neon",
+        "siteName": "Render",
+        "date": "2026-10-14T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.6720572710037231,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/render-postgres-vs-neon#1",
+        "title": "Render Postgres vs Neon - Migrating production infrastructure",
+        "siteName": "Render",
+        "date": "2026-10-14T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.6720572710037231,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/how-much-does-cloud-application-hosting-cost-for-small-businesses#1",
+        "title": "How much does cloud application hosting cost for small businesses - Opens in a new window Opens an external website Opens an external website in a new window",
+        "siteName": "Render",
+        "date": "2026-07-07T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.5721558332443235,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/pricing?trk=article-ssr-frontend-pulse_little-text-block#1",
+        "title": "Pricing",
+        "siteName": "Render",
+        "authority": 3,
+        "rerankScore": 1.5121760368347168,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/docs/postgresql-legacy-instance-types",
+        "title": "Render Postgres Legacy Instance Types",
+        "siteName": "Render",
+        "authority": 3,
+        "rerankScore": 1.452371597290039,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/docs/postgresql-legacy-instance-types.md",
+        "title": "",
+        "siteName": "Render",
+        "authority": 3,
+        "rerankScore": 1.3823730945587158,
+        "query": {
+          "q": "postgres pricing",
+          "site": "render.com"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "hetzner-cx23",
+    "queries": [
+      {
+        "q": "CX23 price per month"
+      },
+      {
+        "q": "Hetzner Cloud pricing CX23"
+      }
+    ],
+    "hosts": [
+      "hetzner.com"
+    ],
+    "results": [
+      {
+        "url": "https://costgoat.com/pricing/hetzner",
+        "title": "Hetzner Cloud VPS Pricing Calculator (Nov 2026)",
+        "siteName": "costgoat.com",
+        "date": "2025-11-07T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.5496634244918823,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/nself-org/cli/wiki/Feature-nCloud#1",
+        "title": "Feature nCloud - Skip to content",
+        "siteName": "GitHub",
+        "date": "2026-04-25T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.4673007726669312,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://community.openclaw.ai/t/claw-vps-host-list-resource/189",
+        "title": "Claw VPS Host List Resource - Ecosystem - OpenClaw Community",
+        "siteName": "OpenClaw Community",
+        "date": "2026-10-19T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.4299780130386353,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.cloudhim.com/cloud-costs/hetzner-cx22-pricing-2026",
+        "title": "Hetzner CX23 Pricing (Formerly CX22): Full 2026\u20132027 Price Tables",
+        "siteName": "Cloudhim",
+        "date": "2026-09-20T16:00:00.000Z",
+        "authority": 1,
+        "rerankScore": 1.3904088735580444,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.whtop.com/plans/potenting.com/156321#1",
+        "title": "CX_23 > potenting.com, #156321 on Cloud, Linux/Windows - 45k user reviews & 1 million votes, over 29k",
+        "siteName": "WHTop",
+        "date": "2026-09-01T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.3743371963500977,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://getyourwebhost.com/hetzner-renewal-price/",
+        "title": "Hetzner renewal price 2026: no increase at renewal | GetYourWebHost",
+        "siteName": "getyourwebhost.com",
+        "date": "2026-10-18T16:00:00.000Z",
+        "authority": 1,
+        "rerankScore": 1.320075511932373,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://vpsfor.dev/posts/hetzner-cx22-vs-cx23-2026/",
+        "title": "Hetzner CX22 vs CX23 in 2026: Should You Migrate? | VPS for Devs",
+        "siteName": "VPS for Devs",
+        "date": "2026-09-08T16:00:00.000Z",
+        "authority": 1,
+        "rerankScore": 1.3048746585845947,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dev.to/muhiak/building-a-managed-database-service-on-eu3-hetzner-servers-the-economics-of-eu-cloud-sovereignty-237g#1",
+        "title": "Building a Managed Database Service on \u20ac3 Hetzner Servers: The Economics of EU Cloud Sovereignty - DEV Community",
+        "siteName": "DEV Community",
+        "date": "2025-12-08T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.2972742319107056,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://vpsdex.com/en/activity/hetzner-cloud-pricing-2026/",
+        "title": "Hetzner Cloud Pricing 2026: CX23 \u20ac5.49, CAX11 \u20ac5.99 \u2014 Full Price Table",
+        "siteName": "vpsdex.com",
+        "date": "2026-10-20T16:00:00.000Z",
+        "authority": 1,
+        "rerankScore": 1.2506648302078247,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://webbynode.com/clusters/hetzner-cx23-hel",
+        "title": "hetzner cx23 \u2014 Helsinki (hel1) Cluster (AMD EPYC-Rome Processor lineage)",
+        "siteName": "webbynode.com",
+        "authority": 2,
+        "rerankScore": 1.235100269317627,
+        "query": {
+          "q": "CX23 price per month"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.vpsbenchmarks.com/compare/hetzner_vs_pq.hosting#1",
+        "title": "Hetzner: performance, features and prices - Can't find providers for 'hetzner_vs_pq'",
+        "siteName": "VPSBenchmarks",
+        "date": "2026-08-28T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.vpsbenchmarks.com/compare/hetzner_vs_webyne#1",
+        "title": "Hetzner vs Webyne: performance, features and prices",
+        "siteName": "VPSBenchmarks",
+        "date": "2026-08-28T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.0096490383148193,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.vpsbenchmarks.com/screener/hosters/hetzner_vs_linkdata#matching-plans",
+        "title": "Screen VPS from Hetzner and Linkdata.com",
+        "siteName": "VPSBenchmarks",
+        "authority": 3,
+        "rerankScore": 1.842631220817566,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.hetzner.com/de/cloud/cost-optimized/",
+        "title": "Cost-Optimized: G\u00fcnstiger Einstieg",
+        "siteName": "Hetzner",
+        "authority": 3,
+        "rerankScore": 1.827447772026062,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.eucloudcost.com/providers/hetzner/#main-content",
+        "title": "Hetzner Pricing 2026: VPS from \u20ac5.49/mo, 20 TB Free Egress",
+        "siteName": "EU Cloud Cost",
+        "date": "2026-10-31T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.6720572710037231,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://comparedge.com/tools/hetzner/cost-guide",
+        "title": "Hetzner VAT, Add-ons & True Monthly Cost 2026 | True Cost Guide",
+        "siteName": "14 Best Phind Alternatives 2026: v0 by Vercel & Cline",
+        "date": "2026-07-14T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.648983597755432,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://costgoat.com/pricing/hetzner",
+        "title": "Hetzner Cloud VPS Pricing Calculator (Nov 2026)",
+        "siteName": "costgoat.com",
+        "date": "2025-11-07T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.6336115598678589,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://getdeploying.com/hetzner#1",
+        "title": "Hetzner: Review, Pricing & Alternatives - Hetzner",
+        "siteName": "GetDeploying",
+        "date": "2026-09-17T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.610553741455078,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.eucloudcost.com/compare/azure-vs-hetzner/#main-content",
+        "title": "Hetzner is 55% Cheaper than Azure AKS: K8s Pricing 2026",
+        "siteName": "EU Cloud Cost",
+        "date": "2026-10-26T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.610553741455078,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dev.to/rozoomnews/hetzner-cloud-review-2026-four-years-three-servers-and-every-bill-explained-26kn#comments#1",
+        "title": "Hetzner Cloud Review 2026: Four Years, Three Servers, and Every Bill Explained - DEV Community",
+        "siteName": "DEV Community",
+        "date": "2026-10-26T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.5951817035675049,
+        "query": {
+          "q": "Hetzner Cloud pricing CX23"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "node-lts",
+    "queries": [
+      {
+        "q": "latest Node.js LTS version"
+      }
+    ],
+    "hosts": [
+      "nodejs.org"
+    ],
+    "results": [
+      {
+        "url": "https://safeguard.sh/resources/blog/nodejs-24-maintenance-nodejs-26-lts-october-2026",
+        "title": "Node.js 24 Enters Maintenance, Node.js 26 Becomes LTS: What Changes for Security Fixes",
+        "siteName": "Blog | Safeguard \u2014 Software Supply Chain Security Insights",
+        "date": "2026-10-17T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.0248324871063232,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://nodesource.com/blog/Update-nodejs-versions-on-windows",
+        "title": "How to Update Node.js Versions on Windows",
+        "siteName": "NodeSource",
+        "date": "2026-09-27T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.994465708732605,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://thinkit.co.jp/news/39694",
+        "title": "\u300cNode.js 26.13.0\u300d\u30ea\u30ea\u30fc\u30b9 \u2500 \u30b3\u30fc\u30c9\u30cd\u30fc\u30e0\u300cLithium\u300d\u306eLTS\u3078\u79fb\u884c",
+        "siteName": "Think IT\uff08\u30b7\u30f3\u30af\u30a4\u30c3\u30c8\uff09",
+        "date": "2026-11-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9489153623580933,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://nodejs.org/fr/about/previous-releases",
+        "title": "Node.js \u2014 Node.js Releases",
+        "siteName": "Node.js",
+        "authority": 3,
+        "rerankScore": 1.9033650159835815,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://safeguard.sh/resources/blog/update-node-js",
+        "title": "How to Update Node.js Safely: Security Guide",
+        "siteName": "Blog | Safeguard \u2014 Software Supply Chain Security Insights",
+        "date": "2026-04-06T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.8044588565826416,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://nodejs.org/ro/about/previous-releases",
+        "title": "Node.js \u2014 Lans\u0103ri Node.js",
+        "siteName": "Node.js",
+        "authority": 3,
+        "rerankScore": 1.7966705560684204,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://url.nodejs.cn/en/about/previous-releases",
+        "title": "Node.js \u4e2d\u6587\u7f51",
+        "siteName": "nodejs.cn",
+        "authority": 3,
+        "rerankScore": 1.7966705560684204,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://safeguard.sh/resources/blog/how-long-is-a-nodejs-lts-release-supported",
+        "title": "How long is a Node.js LTS release supported?",
+        "siteName": "Blog | Safeguard \u2014 Software Supply Chain Security Insights",
+        "date": "2026-10-17T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.7966705560684204,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/endoflife-date/endoflife.date/blob/3407e695/products/nodejs.md?plain=1#L228-L236#1",
+        "title": "endoflife.date/products/nodejs.md at 3407e69578a9937944b9f8f5dde6c1f9f1879671 \u00b7 endoflife-date/endoflife.date \u00b7 GitHub",
+        "siteName": "GitHub",
+        "date": "2026-01-19T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.7810938358306885,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/nodejs/Release/main/README.md#1",
+        "title": "",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 1.765517234802246,
+        "query": {
+          "q": "latest Node.js LTS version"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "postgres-17",
+    "queries": [
+      {
+        "q": "PostgreSQL 17 release notes"
+      }
+    ],
+    "hosts": [
+      "postgresql.org"
+    ],
+    "results": [
+      {
+        "url": "https://www.postgresql.org/docs/release/17.7/",
+        "title": "PostgreSQL: Release Notes",
+        "siteName": "PostgreSQL",
+        "date": "2025-11-12T16:00:00.000Z",
+        "authority": 4,
+        "rerankScore": 2.195354461669922,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.postgresql.org/docs/17/release-17-7.html#RELEASE-17-7-MIGRATION",
+        "title": "E.5. Release 17.7",
+        "siteName": "PostgreSQL",
+        "date": "2026-08-12T16:00:00.000Z",
+        "authority": 4,
+        "rerankScore": 2.101604461669922,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.postgresql.org/message-id/attachment/160287/17beta1.md",
+        "title": "",
+        "siteName": "PostgreSQL",
+        "authority": 4,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://metadata.ftp-master.debian.org/changelogs/main/p/postgresql-17/postgresql-17_17.7-0+deb13u1_changelog",
+        "title": "",
+        "siteName": "Debian",
+        "authority": 4,
+        "rerankScore": 2.0096490383148193,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://launchpad.net/ubuntu/plucky/+source/postgresql-17/+changelog#1",
+        "title": "Change log : Plucky (25.04) : postgresql-17 package : Ubuntu",
+        "siteName": "Launchpad",
+        "authority": 3,
+        "rerankScore": 1.9489153623580933,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.alibabacloud.com/help/en/rds/apsaradb-rds-for-postgresql/apsaradb-rds-for-postgresql-supports-postgresql-17#1",
+        "title": "ApsaraDB RDS for PostgreSQL supports PostgreSQL 17 - Alibaba Cloud - Search for Help Content",
+        "siteName": "Alibaba Cloud",
+        "date": "2026-09-03T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9489153623580933,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://bugs.launchpad.net/ubuntu/+source/postgresql-17/17.9-0ubuntu0.25.10.1#1",
+        "title": "postgresql-17 17.9-0ubuntu0.25.10.1 source package in Ubuntu - postgresql-17 17.9-0ubuntu0.25.10.1 source package in Ubuntu",
+        "siteName": "Launchpad Bugs",
+        "date": "2026-03-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9489153623580933,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://launchpad.net/ubuntu/+source/postgresql-17/17.7-0ubuntu0.25.10.1#1",
+        "title": "17.7-0ubuntu0.25.10.1 : postgresql-17 package : Ubuntu",
+        "siteName": "Launchpad",
+        "date": "2025-12-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9185484647750857,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://help.aliyun.com/en/rds/apsaradb-rds-for-postgresql/apsaradb-rds-for-postgresql-supports-postgresql-17#1",
+        "title": "[New features/New specifications] ApsaraDB RDS for PostgreSQL supports PostgreSQL 17 - ApsaraDB RDS for PostgreSQL supports PostgreSQL 17",
+        "siteName": "\u963f\u91cc\u4e91\u6587\u6863\u4e2d\u5fc3",
+        "date": "2026-03-25T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9185484647750857,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/scaleway/docs-content/blob/5c05f6ac97bc5872309307e98cf6bb3b235c7c9f/pages/managed-databases-for-postgresql-and-mysql/reference-content/pg-version-updates.mdx",
+        "title": "PostgreSQL version updates",
+        "siteName": "GitHub",
+        "date": "2026-11-05T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9033650159835815,
+        "query": {
+          "q": "PostgreSQL 17 release notes"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "cloudflare-workers",
+    "queries": [
+      {
+        "q": "Cloudflare Workers pricing"
+      }
+    ],
+    "hosts": [
+      "cloudflare.com"
+    ],
+    "results": [
+      {
+        "url": "https://developers.cloudflare.com/workers/platform/pricing/?cf_page=workers-for-students%2F#1",
+        "title": "Pricing \u00b7 Cloudflare Workers docs - Pricing",
+        "siteName": "Cloudflare Docs",
+        "date": "2026-10-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.695354461669922,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://developers.cloudflare.com/workers/platform/pricing/index.md#1",
+        "title": "description: Workers plans and pricing information - description: Workers plans and pricing information",
+        "siteName": "Cloudflare Docs",
+        "authority": 3,
+        "rerankScore": 2.664104461669922,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://developers.cloudflare.com/workers/platform/pricing/index.md",
+        "title": "",
+        "siteName": "Cloudflare Docs",
+        "authority": 3,
+        "rerankScore": 2.664104461669922,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/pylonsync/pylon/blob/764ea671d85c22877cf9ea30fda07b2af2f4bd3c/apps/docs/operations/workers-costs.mdx",
+        "title": "Cloudflare Workers costs",
+        "siteName": "GitHub",
+        "date": "2026-10-27T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.179729461669922,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://shattered.io/cloudflare-workers-pricing-vs-lambda-azure-functions-cloud-run-2026/",
+        "title": "Cloudflare Workers Pricing: $5 Plan vs 3 Rivals [2026]",
+        "siteName": "Shattered",
+        "date": "2026-11-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.132854461669922,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://cloudflare-docs.cloudflare-docs.workers.dev/workers/static-assets/billing-and-limitations/",
+        "title": "Billing and Limitations \u00b7 Cloudflare Workers docs",
+        "siteName": "Cloudflare Docs",
+        "date": "2026-04-22T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.101604461669922,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.morphllm.com/comparisons/cloudflare-workers-vs-vercel#1",
+        "title": "Cloudflare Workers vs Vercel (2026): $0.30/M Requests vs $20/Seat | Pricing, Cold Starts, Limits - Cloudflare Workers vs Vercel (2026): $0.30/M Requests vs $20/Seat, With the Actual Bill Math",
+        "siteName": "Morph",
+        "date": "2026-06-08T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://shattered.io/cloudflare-workers-vs-vercel-edge-2026/",
+        "title": "Cloudflare Workers vs Vercel Edge: $32 vs $200/Mo",
+        "siteName": "Shattered",
+        "date": "2026-08-30T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/pylonsync/pylon/blob/d1db30f93693ee526ebe2d01098edb5a2ae3485a/apps/docs/operations/workers-costs.mdx#1",
+        "title": "pylon/apps/docs/operations/workers-costs.mdx at d1db30f93693ee526ebe2d01098edb5a2ae3485a \u00b7 pylonsync/pylon - Skip to content",
+        "siteName": "GitHub",
+        "date": "2026-04-22T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/refs/heads/production/src/content/docs/workers/platform/pricing.mdx#1",
+        "title": "pcx_content_type: concept - pcx_content_type: concept",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Cloudflare Workers pricing"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "linear-pricing",
+    "queries": [
+      {
+        "q": "Linear pricing plans"
+      }
+    ],
+    "hosts": [
+      "linear.app"
+    ],
+    "results": [
+      {
+        "url": "https://linear.app/pricing?_rsc=1pn8p",
+        "title": "Pricing \u2013 Linear",
+        "siteName": "Linear",
+        "authority": 3,
+        "rerankScore": 2.492229461669922,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://linear.app/docs/changes-to-linears-pricing-plans",
+        "title": "Changes to Linear\u2019s pricing plans \u2013 Linear Docs",
+        "siteName": "Linear",
+        "authority": 3,
+        "rerankScore": 2.117229461669922,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://linear.app/docs/billing-and-plans.md",
+        "title": "",
+        "siteName": "Linear",
+        "authority": 3,
+        "rerankScore": 2.040015935897827,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://ones.com/blog/solution-guide/linear-pricing-2026-plans-alternatives/",
+        "title": "Linear Pricing 2026: Plans, Features & Alternatives",
+        "siteName": "ONES.com",
+        "date": "2026-08-25T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.8729981184005735,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://costbench.com/software/developer-tools/linear/#negotiation",
+        "title": "Linear Pricing 2026: 4 Plans, Free\u2013$16/user/mo",
+        "siteName": "ServiceNow vs HubSpot Service Hub Pricing (2026)",
+        "date": "2026-10-28T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.6643555164337158,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.softwareadvice.com/product/524860-Linear/#reviews#1",
+        "title": "Linear Review - Welcome",
+        "siteName": "Software Advice",
+        "authority": 3,
+        "rerankScore": 1.648983597755432,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/OpenAgentsInc/openagents/8f84d05896ef14edee491621bf977ee5315cc8ed/docs/teardowns/linear-agents.md#2",
+        "title": "Linear Agents: Full Product Report - Linear\u2019s native Coding Sessions and Loops do provide managed execution, but the Agent Platform itself is not a generic hosted sa...",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 1.6336115598678589,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.getpricepulse.com/blog/linear-pricing-2026-complete-guide.html",
+        "title": "Linear Pricing 2026: Free vs Basic vs Business vs Enterprise Breakdown",
+        "siteName": "PricePulse",
+        "date": "2026-08-03T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.5874958038330078,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.getpricepulse.com/companies/linear-pricing.html",
+        "title": "Linear Pricing 2026: Basic $10, Business $16, and the 2025 Increase",
+        "siteName": "PricePulse",
+        "date": "2026-02-19T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.5798097848892212,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://outmano.com/compare/asana-vs-linear",
+        "title": "Asana vs Linear: Pricing, Plans & Free Tiers (2026) | Outmano",
+        "siteName": "outmano.com",
+        "date": "2026-09-28T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.5798097848892212,
+        "query": {
+          "q": "Linear pricing plans"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "stripe-fees",
+    "queries": [
+      {
+        "q": "Stripe pricing fees"
+      },
+      {
+        "q": "Stripe card processing fee 2026"
+      }
+    ],
+    "hosts": [
+      "stripe.com"
+    ],
+    "results": [
+      {
+        "url": "https://stripe.com/in/pricing?__hsfp=2457275965&__hssc=106715356.1.1670198400417&__previewld#1",
+        "title": "Pricing & Fees - Pricing built for businesses of all sizes",
+        "siteName": "Stripe",
+        "authority": 3,
+        "rerankScore": 2.320354461669922,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://stripe.com/ja-in/pricing#1",
+        "title": "Stripe | \u6c7a\u6e08\u30b5\u30fc\u30d3\u30b9\u306e\u6599\u91d1\u30fb\u624b\u6570\u6599\u3001\u5c0e\u5165\u306b\u3064\u3044\u3066 - \u3042\u3089\u3086\u308b\u898f\u6a21\u306e\u30d3\u30b8\u30cd\u30b9\u306b\u5bfe\u5fdc\u3059\u308b\u6599\u91d1\u4f53\u7cfb",
+        "siteName": "Stripe",
+        "authority": 3,
+        "rerankScore": 2.164104461669922,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://stripe.com/es-419-in/pricing#1",
+        "title": "Precios y comisiones | Sitio oficial de Stripe - Precios a la medida para todo tipo de empresas",
+        "siteName": "Stripe",
+        "authority": 3,
+        "rerankScore": 2.132854461669922,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dodopayments.com/blogs/adyen-vs-stripe-saas#1#1#1",
+        "title": "Adyen vs Stripe for SaaS in 2026: Honest Head-to-Head | Dodo Payments",
+        "siteName": "Dodo Payments",
+        "date": "2026-06-04T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9337319135665896,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dodopayments.com/blogs/stripe-fees-calculator#1",
+        "title": "Stripe Fees Calculator 2026: See Your Real Cost (Beyond 2.9% + 30\u00a2) | Dodo Payments - Apr 4, 2026 11 min read",
+        "siteName": "Dodo Payments",
+        "date": "2026-04-03T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9033650159835815,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://freemius.com/blog/stripe-transaction-fees-real-cost/#tax_compliance_fees",
+        "title": "Stripe fees for SaaS and plugin sellers: Full breakdown",
+        "siteName": "Freemius",
+        "date": "2026-10-06T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.8578146696090696,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dodopayments.com/blogs/stripe-invoicing-fees-explained#1",
+        "title": "Stripe Invoicing Fees Explained: What Each Invoice Costs | Dodo Payments - Oct 31, 2026 14 min read",
+        "siteName": "Dodo Payments",
+        "date": "2026-10-30T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.8578146696090696,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://docs.mightynetworks.com/for-hosts/payments-and-access/does-mighty-networks-charge-a-transaction-fee",
+        "title": "Does Mighty Networks Charge a Transaction Fee? - Mighty Networks Developer",
+        "siteName": "Mighty Networks",
+        "date": "2026-11-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.7810938358306885,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://docs.mightynetworks.com/for-hosts/payments-and-access/how-do-i-get-paid",
+        "title": "How Do I Get Paid? - Mighty Networks Developer",
+        "siteName": "Mighty Networks",
+        "date": "2026-11-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.765517234802246,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://themeisle.com/blog/stripe-wordpress-cost-calculator/#1",
+        "title": "The Real Cost of Stripe on WordPress: Plugin Fees and Break-Even Calculator",
+        "siteName": "Themeisle",
+        "date": "2026-09-21T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.687633991241455,
+        "query": {
+          "q": "Stripe pricing fees"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://stripe.com/in/pricing?__hsfp=2457275965&__hssc=106715356.1.1670198400417&__previewld#1",
+        "title": "Pricing & Fees - Pricing built for businesses of all sizes",
+        "siteName": "Stripe",
+        "authority": 3,
+        "rerankScore": 2.226604461669922,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dodopayments.com/blogs/stripe-invoicing-fees-explained#1",
+        "title": "Stripe Invoicing Fees Explained: What Each Invoice Costs | Dodo Payments - Oct 31, 2026 14 min read",
+        "siteName": "Dodo Payments",
+        "date": "2026-10-30T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.9337319135665896,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dodopayments.com/blogs/stripe-fees-calculator#1#1",
+        "title": "Stripe Fees Calculator 2026: See Your Real Cost (Beyond 2.9% + 30\u00a2) | Dodo Payments",
+        "siteName": "Dodo Payments",
+        "date": "2026-04-03T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.8881815671920776,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://freemius.com/blog/stripe-transaction-fees-real-cost/#tax_compliance_fees",
+        "title": "Stripe fees for SaaS and plugin sellers: Full breakdown",
+        "siteName": "Freemius",
+        "date": "2026-10-06T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.8881815671920776,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://stripe.com/au/pricing/local-payment-methods?__previewid#1",
+        "title": "Local payment methods pricing - Accept popular payment methods with a single integration",
+        "siteName": "Stripe",
+        "authority": 3,
+        "rerankScore": 1.7032105922698977,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://dodopayments.com/blogs/stripe-vs-paypal-2026#1",
+        "title": "Stripe vs PayPal in 2026: Fees, Features, and Which One Wins for SaaS | Dodo Payments - Jun 2, 2026 18 min read",
+        "siteName": "Dodo Payments",
+        "date": "2026-06-01T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.687633991241455,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://paymentcloudinc.com/blog/stripe-fees/",
+        "title": "Stripe Fees and Pricing: Your Complete Guide for 2026",
+        "siteName": "PaymentCloud",
+        "date": "2022-04-22T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.6566694974899292,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://business.usnews.com/credit-card-processing/stripe",
+        "title": "Stripe Credit Card Processing Review",
+        "siteName": "usnews.com",
+        "date": "2026-02-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.6566694974899292,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.activepieces.com/blog/stripe-pricing-2026-total-transaction-add-on-costs#1",
+        "title": "Stripe Pricing 2026: Total Transaction & Add-on Costs",
+        "siteName": "Activepieces",
+        "date": "2026-10-14T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.5951817035675049,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://stripe.com/nl-in/pricing#1",
+        "title": "Tarieven en kosten | Offici\u00eble website van Stripe - Tarieven voor elke onderneming",
+        "siteName": "Stripe",
+        "authority": 3,
+        "rerankScore": 1.5951817035675049,
+        "query": {
+          "q": "Stripe card processing fee 2026"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "fly-io",
+    "queries": [
+      {
+        "q": "Fly.io pricing"
+      }
+    ],
+    "hosts": [
+      "fly.io"
+    ],
+    "results": [
+      {
+        "url": "https://fly.io/pricing.md",
+        "title": "",
+        "siteName": "Fly.io",
+        "authority": 3,
+        "rerankScore": 2.429729461669922,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/superfly/docs/blob/34ce37aaa5c8e5aaf43c8223aa998750ef2069d2/about/pricing.mdx",
+        "title": "Fly.io Resource Pricing",
+        "siteName": "GitHub",
+        "date": "2026-11-05T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.257854461669922,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://flyio-landing.fly.dev/docs/about/pricing/",
+        "title": "Fly.io Resource Pricing",
+        "siteName": "Fly",
+        "authority": 3,
+        "rerankScore": 2.242229461669922,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/superfly/docs/blob/34ce37aaa5c8e5aaf43c8223aa998750ef2069d2/about/billing.mdx",
+        "title": "Fly.io Billing",
+        "siteName": "GitHub",
+        "date": "2026-11-05T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.101604461669922,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.activepieces.com/blog/fly-io-pricing-in-2026-for-machines-volumes-and-ips#1",
+        "title": "Fly.io Pricing in 2026 for Machines, Volumes and IPs - Skip to content",
+        "siteName": "Activepieces",
+        "date": "2026-11-02T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.101604461669922,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://northflank.com/blog/railway-vs-flyio#1",
+        "title": "Railway vs Fly.io in 2026: pricing, infrastructure, and platform comparison | Blog \u2014 Northflank",
+        "siteName": "Northflank",
+        "date": "2026-10-12T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.0096490383148193,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://docs.fly.io/about/pricing",
+        "title": "Fly.io Resource Pricing - Fly.io",
+        "siteName": "Fly.io",
+        "date": "2026-11-08T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.0020573139190674,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://render.com/articles/fly-io-vs-vercel#frequently-asked-questions#1",
+        "title": "Fly.io vs Vercel - Migrating production infrastructure",
+        "siteName": "Render",
+        "date": "2026-10-22T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.986873984336853,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://flyio-landing.fly.dev/docs/about/discontinued-plans/",
+        "title": "Discontinued Plans",
+        "siteName": "Fly",
+        "date": "2026-08-13T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.979282259941101,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://community.fly.io/t/what-starting-plans-are-available-on-fly-for-an-in-development-app/28509/2#1",
+        "title": "What starting plans are available on Fly for an in-development app? - Questions / Help - Fly.io - post by SaXx143 on Aug 18",
+        "siteName": "Fly.io",
+        "date": "2026-08-17T16:00:00.000Z",
+        "authority": 2,
+        "rerankScore": 1.7966705560684204,
+        "query": {
+          "q": "Fly.io pricing"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "docker-pricing",
+    "queries": [
+      {
+        "q": "Docker subscription pricing"
+      }
+    ],
+    "hosts": [
+      "docker.com"
+    ],
+    "results": [
+      {
+        "url": "https://www.docker.com/pricing-b/#1",
+        "title": "Pricing | Docker - #",
+        "siteName": "Docker",
+        "date": "2026-06-17T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.632854461669922,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.docker.com/ja-jp/legal/cookies/#1",
+        "title": "Cookies - Docker - Products",
+        "siteName": "Docker",
+        "date": "2026-05-06T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.570354461669922,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.docker.com/pricing/?at_exp=DO103.A#1",
+        "title": "Pricing | Docker - #",
+        "siteName": "Docker",
+        "date": "2025-04-10T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.476604461669922,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.sdxcentral.com/news/docker-business-tier-centralizes-management-ramps-security/",
+        "title": "Docker Business Tier Centralizes Management, Ramps Security",
+        "siteName": "SDxCentral",
+        "date": "2025-11-17T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.0248324871063232,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/docker/docs/8b618a6795ddc8775e7280e4a4e08044edf23a6b/subscription/faq.md#1",
+        "title": "description: Subscription & Billing FAQs",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 1.9337319135665896,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/gregology/docker.github.io/refs/heads/master/subscription/faq.md#1",
+        "title": "",
+        "siteName": "GitHub",
+        "authority": 3,
+        "rerankScore": 1.9033650159835815,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.softwareadvice.com/product/430741-Docker/#1",
+        "title": "Docker 2026: Benefits, Features & Pricing - Software Categories",
+        "siteName": "Software Advice",
+        "authority": 3,
+        "rerankScore": 1.8881815671920776,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.vendr.com/marketplace/docker?int_campaign=2024-Q3-07-GLOB-OSH-GO_MarketplaceVisits_From_SEO_BG#2",
+        "title": "Docker Software Pricing & Plans 2026: See Your Cost - Pricing component | Docker | AWS ECR",
+        "siteName": "Vendr",
+        "authority": 3,
+        "rerankScore": 1.8578146696090696,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://github.com/robhunter/agentdeals/issues/62#1",
+        "title": "Track new deal changes \u2014 Atlassian DC, Docker, DigitalOcean Hatch, Google Startups \u00b7 Issue #62 \u00b7 robhunter/agentdeals - Skip to content",
+        "siteName": "GitHub",
+        "date": "2026-02-25T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.765517234802246,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.softwareadvice.com/compare/397793-microsoft-azure/vs/430741-Docker/#1",
+        "title": "Microsoft Azure vs Docker: Which is best for you? - Software Categories",
+        "siteName": "Software Advice",
+        "date": "2026-09-28T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 1.765517234802246,
+        "query": {
+          "q": "Docker subscription pricing"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  },
+  {
+    "id": "anthropic-pricing",
+    "queries": [
+      {
+        "q": "Claude API pricing"
+      }
+    ],
+    "hosts": [
+      "anthropic.com",
+      "claude.com"
+    ],
+    "results": [
+      {
+        "url": "https://platform.claude.com/docs/en/about-claude/pricing.md",
+        "title": "",
+        "siteName": "Claude Platform",
+        "authority": 3,
+        "rerankScore": 2.445354461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 0,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://claude.com/de/platform/api?hubs_content=blog.hubspot.com%2Fmarketing%2Fai-content-generators&hubs_content-cta=generative-ai-tools&utm_campaign=WEEKLY&utm_medium=email&_hsenc=p2ANqtz-_Uaj8IZUCTy4n8uOnuOfHAKcJTZhdO5uDWhegqy8-fE3hmCLzyjgqdgaj9joQFpQGZF7wHqfz5QkUk_HHqSvjT14pXhg&_hsmi=338304533&utm_content=338116402&utm_source=hs_email#1",
+        "title": "Claude Platform | Claude by Anthropic - Claude Platform",
+        "siteName": "Claude",
+        "authority": 3,
+        "rerankScore": 2.414104461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 1,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://claude.com/fr/platform/api?8adb0641_page=7#1",
+        "title": "Claude Platform | Claude par Anthropic - Claude Platform",
+        "siteName": "Claude",
+        "authority": 3,
+        "rerankScore": 2.304729461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 2,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://raw.githubusercontent.com/bojieli/ai-infra-book/refs/heads/main/references/outline-checks/2026-09-07/platform-routing/claude-api-pricing.md#1",
+        "title": "",
+        "siteName": "GitHub",
+        "date": "2026-09-06T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.148479461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 3,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://docs.venice.ai/models/claude-opus-4-6",
+        "title": "Claude Opus 4.6 API: Pricing and Specs | Venice",
+        "siteName": "Venice API Docs",
+        "date": "2026-11-08T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.132854461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 4,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://docs.venice.ai/models/claude-opus-4-5",
+        "title": "Claude Opus 4.5 API: Pricing and Specs | Venice",
+        "siteName": "Venice API Docs",
+        "date": "2026-11-08T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.117229461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 5,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.cloudzero.com/blog/claude-pricing/?utm_source=aiunpacker.com&utm_medium=referral&utm_campaign=outbound#1",
+        "title": "Claude pricing in 2026: every plan, API rate, and what it actually costs",
+        "siteName": "CloudZero",
+        "date": "2026-07-26T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.101604461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 6,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://docs.venice.ai/models/claude-opus-5",
+        "title": "Claude Opus 5 API: Pricing and Specs | Venice",
+        "siteName": "Venice API Docs",
+        "date": "2026-11-08T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.101604461669922,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 7,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.truefoundry.io/blog/claude-api-pricing",
+        "title": "Claude API Pricing: A Model-by-Model Cost Breakdown",
+        "siteName": "truefoundry.io",
+        "date": "2026-10-31T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.070382833480835,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 8,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      },
+      {
+        "url": "https://www.morphllm.com/anthropic-api-pricing#1",
+        "title": "Anthropic API Pricing (2026): Claude API Cost per Token, Opus 5.5, Sonnet 5.5, Haiku 5.5 | Morph - Anthropic API Pricing (November 2026): Claude API Cost per Token for Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5",
+        "siteName": "Morph",
+        "date": "2026-10-31T16:00:00.000Z",
+        "authority": 3,
+        "rerankScore": 2.040015935897827,
+        "query": {
+          "q": "Claude API pricing"
+        },
+        "rank": 9,
+        "content": "",
+        "summary": "",
+        "snippet": ""
+      }
+    ]
+  }
+]
