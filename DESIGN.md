@@ -27,7 +27,7 @@ The prompt also enforces honesty: never invent a past conversation, say first wh
 
 **Hosted the same way.** A synchronous `Sql` interface: SQLite locally, a Durable Object per visitor on Cloudflare. Shared store, schema and API; a Worker in front sets the cookie and meters questions per visitor, per network and site-wide. upheld stays local: it needs its own models.
 
-**Cost and scale.** A searching answer spends about 0.6¢ on the Search API (a median of eight queries at $0.75 per 1,000) and 0.07¢ on reasoning, which is why a step is capped at 8 queries and a turn at 3 rounds; 1,500 questions a day bound the bill. One DeepSeek key covers model and search, and the model client speaks the OpenAI API, so the model is a config change while the search is not. At a hundred times the traffic the first bottleneck is the single Budget Durable Object that meters every question, then the per-isolate query cache, then cold starts — none of which needs a change to the agent loop.
+**Cost and scale.** A searching answer spends about 0.6¢ on the Search API (a median of eight queries at $0.75 per 1,000) and 0.07¢ on reasoning, which is why a step is capped at 8 queries and a turn at 3 rounds; 500 questions a day bound the bill. One DeepSeek key covers model and search, and the model client speaks the OpenAI API, so the model is a config change while the search is not. At a hundred times the traffic the first bottleneck is the single Budget Durable Object that meters every question, then the per-isolate query cache, then cold starts — none of which needs a change to the agent loop.
 
 ## Considered and rejected
 

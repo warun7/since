@@ -6,6 +6,7 @@ import { DurableObject } from 'cloudflare:workers';
 import type { Hono } from 'hono';
 import { chatMessage, createApi, crossSite, MAX_BODY_BYTES } from '../src/app.js';
 import { SECURITY_HEADERS } from '../src/headers.js';
+import { networkOf } from '../src/network.js';
 import { migrate } from '../src/memory/schema.js';
 import type { Sql } from '../src/memory/sql.js';
 import { MemoryStore } from '../src/memory/store.js';
@@ -21,10 +22,10 @@ interface Env {
 
 /** Per visitor, in any 24 hours. */
 const QUESTIONS_PER_VISITOR = 40;
-/** Per network (IP address), per UTC day. A new cookie doesn't reset this one. */
+/** Per network (an IPv4 address, or an IPv6 /64), per UTC day. A new cookie doesn't reset this one. */
 const QUESTIONS_PER_NETWORK = 60;
 /** Across all visitors, per UTC day: a ceiling on what the demo can spend. */
-const QUESTIONS_PER_DAY = 1500;
+const QUESTIONS_PER_DAY = 500;
 const RUN_IT_YOURSELF = 'Run it yourself for more: github.com/warun7/since';
 
 /** A memory is deleted this long after its last visit, and one with nothing in it much sooner. */
@@ -118,7 +119,7 @@ export class Visitor extends DurableObject<Env> {
   /** The site-wide and per-network daily limits, charged only for a request about to run. */
   private async admit(cost: number, request: Request): Promise<string | null> {
     const { Budget } = exportsOf(this.ctx);
-    return Budget.get(Budget.idFromName('global')).take(cost, request.headers.get('CF-Connecting-IP') ?? 'unknown');
+    return Budget.get(Budget.idFromName('global')).take(cost, networkOf(request.headers.get('CF-Connecting-IP')));
   }
 }
 
@@ -195,7 +196,7 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
   if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
   if (url.pathname === '/api/health') return Response.json({ ok: true });
 
-  const network = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  const network = networkOf(request.headers.get('CF-Connecting-IP'));
   if (!(await env.API_RATE.limit({ key: network })).success) {
     return Response.json({ error: 'Too many requests. Wait a minute and try again.' }, { status: 429 });
   }
