@@ -196,6 +196,8 @@ export interface Verification {
   flagged: Array<{ claim: string; verdict: string; source?: string; note?: string }>;
   /** Grounding check: figures not on the page but worked out from it ("$150", "= 15 × $10"). */
   worked?: Array<{ figure: string; how: string; source?: string }>;
+  /** Citations added before the answer was saved: a figure cited to the wrong page, and the page it is on. */
+  added?: Array<{ figure: string; source: number }>;
   verifier?: string;
   ms: number;
   error?: string;

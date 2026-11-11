@@ -41,8 +41,8 @@ export interface GroundedClaim {
   verdict: GroundingVerdict;
   /** Figures neither in the cited passages nor worked out from them. */
   missing: Figure[];
-  /** Of the missing, the ones on another page the model was shown, with its numbers. */
-  elsewhere: Array<{ figure: Figure; sources: number[] }>;
+  /** Of the missing, the ones on another page the model was shown: the cites of the figure's part, and the pages it is on. */
+  elsewhere: Array<{ figure: Figure; cites: number[]; sources: number[] }>;
   /** Figures not on the page but worked out from it. */
   worked: WorkedFigure[];
 }
@@ -229,7 +229,8 @@ function tolerance(fig: Figure, approx: boolean): number {
   const [, whole = '', frac = '', scale] = m;
   const place = frac ? -(frac.length - 1) : whole.replace(/,/g, '').match(/0*$/)![0].length;
   const half = 0.5 * 10 ** place * (MULTIPLIER[scale ?? ''] ?? 1);
-  return Math.min(half, value * (approx ? 0.03 : 0.01));
+  // "~$7.90" for $7.91: a figure the answer calls approximate is rounded, whatever digits it shows.
+  return approx ? Math.min(Math.max(half, value * 0.01), value * 0.03) : Math.min(half, value * 0.01);
 }
 
 /**
@@ -245,7 +246,7 @@ function workOut(fig: Figure, ctx: FigureContext, pool: Figure[], counts: number
   const tol = tolerance(fig, ctx.approx);
   const prices = [...new Map(pool.filter((f) => f.unit === fig.unit && Number(f.key) > 0).map((f) => [Number(f.key), f.text])).entries()]
     .slice(0, MAX_PRICES)
-    .map(([v, text]) => ({ v, label: text }));
+    .map(([v, text]) => ({ v, label: text.replace(/(?<=[$€£₹¥])\s+/u, '') }));
   const gaps = prices.flatMap((a) => prices.filter((b) => b.v < a.v).map((b) => ({ v: a.v - b.v, label: `(${a.label} − ${b.label})` })));
   const heads = ctx.seat ? [] : [...new Set(counts)];
   const yearly: [number, string] = [12, ' × 12'];
@@ -331,7 +332,7 @@ export function checkGrounding(input: GroundingInput): { claims: GroundedClaim[]
           .filter(([n, figs]) => !part.cites.includes(n) && figs && appears(fig, figs))
           .map(([n]) => n)
           .sort((a, b) => a - b);
-        if (found.length) elsewhere.push({ figure: fig, sources: found });
+        if (found.length) elsewhere.push({ figure: fig, cites: part.cites, sources: found });
       }
     }
     const text = sentence.replace(MARKER_RUN, (m) => ` ${m.trim()}`).replace(/\s+/g, ' ').trim();
@@ -377,4 +378,114 @@ function missingList(claim: GroundedClaim): string {
     seen.set(f.text, where ? `${f.text} (in ${where.map((n) => `[${n}]`).join('')})` : f.text);
   }
   return [...seen.values()].join(', ');
+}
+
+export interface AddedCitation {
+  figure: string;
+  source: number;
+}
+
+/** Words too common in pricing pages to tie a claim to one: "Jira" ties it, "pricing" doesn't. */
+const COMMON = new Set(
+  ('the and for with per from that this are was not but you your our its all any has have will can each one two new old ' +
+    'price prices pricing plan plans cost costs user users seat seats month monthly year yearly annual annually free tier ' +
+    'team teams paid billing billed list official page site guide review vs compare comparison best www com app org io')
+    .split(' '),
+);
+
+function words(text: string): Set<string> {
+  return new Set([...text.toLowerCase().matchAll(/\p{L}[\p{L}\p{N}]{2,}/gu)].map((m) => m[0]).filter((w) => !COMMON.has(w)));
+}
+
+/**
+ * Adds the citation the model left out. A price or percentage that isn't on the page its claim
+ * cites, but is on another page the model was shown, gets that page's number after the claim's
+ * markers: "… $6.99/user [1][3]" becomes "… [1][3][8]". A figure like "$16" is on many pages, so
+ * the page must also share a name or another of the claim's figures with it ("Jira", "$19.60"),
+ * and the most related page wins, then the most authoritative. Left alone: bare numbers ("2" is
+ * on too many pages to say which was meant), $0, and figures in quotation marks, which quote
+ * something said rather than state a price. It runs before the answer is saved, so the reader,
+ * the memory and the check all see the same text, and the verification lists what was added.
+ */
+export function repairCitations(input: GroundingInput): { answer: string; added: AddedCitation[] } {
+  const shown = new Map((input.shown ?? []).map((s) => [s.n, s]));
+  const pageFigures = new Map([...shown].map(([n, s]) => [n, figures(`${s.title}\n${s.passages.join('\n')}`)]));
+  let answer = input.answer;
+  const added: AddedCitation[] = [];
+  for (const claim of checkGrounding(input).claims) {
+    const claimWords = words(claim.text.replace(MARKER_RUN, ' '));
+    const claimFigures = figures(claim.text.replace(MARKER_RUN, ' '));
+    for (const { figure, cites, sources } of claim.elsewhere) {
+      if (figure.unit === '' || Number(figure.key) === 0) continue;
+      const related = (n: number) => {
+        const page = shown.get(n);
+        if (!page) return 0;
+        const named = [...words(`${page.title} ${page.site}`)].filter((w) => claimWords.has(w)).length;
+        const others = claimFigures.filter((f) => f.key !== figure.key && appears(f, pageFigures.get(n) ?? [])).length;
+        return named + others;
+      };
+      const ranked = sources
+        .map((n) => ({ n, score: related(n), authority: shown.get(n)?.authority ?? -1 }))
+        .filter((c) => c.score > 0)
+        .sort((a, b) => b.score - a.score || b.authority - a.authority || a.n - b.n);
+      const best = ranked[0]?.n;
+      if (best === undefined) continue;
+      const next = addMarker(answer, figure.text, cites, best);
+      if (next === answer) continue;
+      answer = next;
+      added.push({ figure: figure.text, source: best });
+    }
+  }
+  return { answer, added };
+}
+
+/** The end of a sentence or a table cell: a full stop before a space, a line break, a cell edge. */
+const BOUNDARY = /[.!?](?=\s|$)|\n|\|/g;
+
+function citesOf(run: string): number[] {
+  return [...run.matchAll(MARKER)].flatMap((m) => m[1]!.split(',').map((x) => Number(x.trim())));
+}
+
+const setKey = (ns: number[]) => [...new Set(ns)].sort((a, b) => a - b).join(',');
+
+/**
+ * Adds [n] where the figure's part of the sentence is cited, if that part cites exactly `cites`:
+ * after the first markers following the figure in its sentence or table cell, or, when the
+ * figure comes after the sentence's last markers, at the end of the sentence.
+ */
+function addMarker(answer: string, figure: string, cites: number[], n: number): string {
+  const want = setKey(cites);
+  for (let at = answer.indexOf(figure); at >= 0; at = answer.indexOf(figure, at + 1)) {
+    const end = at + figure.length;
+    // "$16" is not the start of "$160" or "$16.50".
+    if (/^(?:\d|[.,]\d)/.test(answer.slice(end)) || /[\p{L}\p{N}]$/u.test(answer.slice(0, at))) continue;
+    const boundary = new RegExp(BOUNDARY.source, 'g');
+    boundary.lastIndex = end;
+    const limit = boundary.exec(answer)?.index ?? answer.length;
+    // A figure in quotation marks quotes something said ('the "$19/month plan" I gave you').
+    const lead = answer.slice(0, at).split(new RegExp(BOUNDARY.source)).at(-1) ?? '';
+    if ((lead.match(/"/g) ?? []).length % 2 === 1 || lead.lastIndexOf('“') > lead.lastIndexOf('”')) continue;
+
+    const runs = new RegExp(MARKER_RUN.source, 'g');
+    runs.lastIndex = end;
+    const next = runs.exec(answer);
+    // Markers left just after the full stop still close the sentence.
+    const closes = next && (next.index < limit || /^[.!?]\s*$/.test(answer.slice(limit, next.index)));
+    if (next && closes) {
+      const has = citesOf(next[0]);
+      if (has.includes(n) || setKey(has) !== want) continue;
+      const close = next.index + next[0].length;
+      return `${answer.slice(0, close)}[${n}]${answer.slice(close)}`;
+    }
+
+    // No markers after it: the figure trails the sentence's last markers, which must be in the same sentence.
+    const before = [...answer.slice(0, at).matchAll(new RegExp(MARKER_RUN.source, 'g'))].at(-1);
+    if (!before) continue;
+    const between = answer.slice(before.index + before[0].length, at);
+    if (new RegExp(BOUNDARY.source).test(between) || setKey(citesOf(before[0])) !== want) continue;
+    let pos = limit;
+    while (pos > end && /\s/.test(answer[pos - 1]!)) pos--;
+    return `${answer.slice(0, pos)} [${n}]${answer.slice(pos)}`;
+  }
+  return answer;
 }

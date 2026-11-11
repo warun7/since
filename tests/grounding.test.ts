@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkGrounding, citedSentences, figures, groundAnswer } from '../src/verify/grounding.js';
+import { checkGrounding, citedSentences, figures, groundAnswer, repairCitations } from '../src/verify/grounding.js';
 import type { Source } from '../src/types.js';
 
 const source = (n: number, ...passages: string[]): Source => ({
@@ -162,6 +162,73 @@ describe('worked-out figures', () => {
     expect(v.flagged).toEqual([
       { claim: 'Jira Standard is $8.15 (monthly $9.70) [1].', verdict: 'in another source', source: '1', note: 'Not in the cited text: $9.70 (in [17])' },
     ]);
+  });
+});
+
+describe('repairCitations', () => {
+  const height = source(1, 'Height shut down on 24 September 2025.');
+  const listing = { ...source(8, 'Team plan: $6.99 per user per month.'), title: 'Height pricing' };
+
+  it("adds the page a price is on when the claim cites another, and the check then passes", () => {
+    const answer = 'Some sites still list Height at $6.99/user [1]. It shut down in 2025 [1].';
+    const { answer: fixed, added } = repairCitations({ answer, sources: [height], shown: [height, listing] });
+    expect(fixed).toBe('Some sites still list Height at $6.99/user [1][8]. It shut down in 2025 [1].');
+    expect(added).toEqual([{ figure: '$6.99', source: 8 }]);
+    expect(checkGrounding({ answer: fixed, sources: [height, listing] }).claims[0]!.verdict).toBe('grounded');
+  });
+
+  it('adds it inside the right table cell, to the part of the sentence the figure is in', () => {
+    const jira = source(3, 'Standard: $8.15 per user/month.');
+    const rise = { ...source(17, 'Jira Standard rose to $9.70 per user.'), title: 'Jira price rise' };
+    const answer = '| | Jira |\n|---|---|\n| Price | Standard $8.15 (monthly $9.70) [3] | Free for 10 [3] |';
+    expect(repairCitations({ answer, sources: [jira], shown: [jira, rise] }).answer).toBe(
+      '| | Jira |\n|---|---|\n| Price | Standard $8.15 (monthly $9.70) [3][17] | Free for 10 [3] |',
+    );
+  });
+
+  it('prefers the most authoritative related page, and leaves bare numbers and missing figures alone', () => {
+    const blog = { ...source(4, 'Height cost $6.99 a seat.'), title: 'Height review', authority: 0 };
+    const official = { ...source(9, 'Team: $6.99 per user.'), title: 'Height plans', authority: 3 };
+    expect(repairCitations({ answer: 'Height was $6.99/user [1].', sources: [height], shown: [height, blog, official] }).added).toEqual([
+      { figure: '$6.99', source: 9 },
+    ]);
+    const teams = source(5, 'Free: 2 teams.');
+    expect(repairCitations({ answer: 'Free has 2 teams [1].', sources: [height], shown: [height, teams] }).added).toEqual([]);
+    expect(repairCitations({ answer: 'Height was $8.50/user [1].', sources: [height], shown: [height, listing] }).added).toEqual([]);
+  });
+
+  it('puts the marker at the end of the sentence when the figure comes after its last one', () => {
+    const answer = "I couldn't read the vendor's table [1], so treat Height's $6.99 as the list price. It is gone [1].";
+    expect(repairCitations({ answer, sources: [height], shown: [height, listing] }).answer).toBe(
+      "I couldn't read the vendor's table [1], so treat Height's $6.99 as the list price [8]. It is gone [1].",
+    );
+  });
+
+  it('keeps markers left after the full stop with their sentence', () => {
+    const answer = 'Height listed $6.99 a seat. [1] It shut down [1].';
+    expect(repairCitations({ answer, sources: [height], shown: [height, listing] }).answer).toBe('Height listed $6.99 a seat. [1][8] It shut down [1].');
+  });
+
+  it('needs the page to share a name or a figure with the claim, and skips quoted figures and $0', () => {
+    const linear = { ...source(6, 'Business: $16 per user.'), title: 'Pricing – Linear', authority: 3 };
+    const jira = { ...source(4, 'Premium $16, or $19.60 billed monthly.'), title: 'Jira Pricing', authority: 3 };
+    const answer = '| | Jira |\n|---|---|\n| Top tier | Premium $16 (monthly $19.60) [1] |';
+    const shown = [height, linear, jira, { ...source(3, 'Premium $19.60.'), title: 'x' }];
+    // [6] has $16 too, but only [4] is about Jira and has the claim's other price; adding it covers $19.60 as well.
+    const fixed = repairCitations({ answer, sources: [height], shown });
+    expect(fixed.added).toEqual([{ figure: '$16', source: 4 }]);
+    expect(fixed.answer).toContain('Premium $16 (monthly $19.60) [1][4] |');
+    expect(repairCitations({ answer: 'Premium is $16 [1].', sources: [height], shown: [height, linear] }).added).toEqual([]);
+    expect(repairCitations({ answer: 'The "$6.99 Height plan" I gave you is gone [1].', sources: [height], shown: [height, listing] }).added).toEqual([]);
+    expect(repairCitations({ answer: 'Height was $0 for small teams [1].', sources: [height], shown: [height, { ...listing, passages: ['Height: $0'] }] }).added).toEqual([]);
+  });
+
+  it('matches the figure whole: "$16" is not the start of "$160"', () => {
+    const plans = { ...source(2, 'Business: $16 per user.'), title: 'Business pricing' };
+    const answer = 'The team plan is $160/mo [1], and Business is $16/user [1].';
+    expect(repairCitations({ answer, sources: [height], shown: [height, plans] }).answer).toBe(
+      'The team plan is $160/mo [1], and Business is $16/user [1][2].',
+    );
   });
 });
 

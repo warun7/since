@@ -740,12 +740,15 @@ function paintVerification(slot, v) {
   }
   const flagged = v.flagged ?? [];
   const worked = grounding ? (v.worked ?? []) : [];
+  const added = v.added ?? [];
   const good = v.cited > 0 && v.supported === v.cited;
   const panel = el(
     'div',
     { class: 'flagged', hidden: true },
     grounding ? el('p', { class: 'how' }, GROUNDING_HOW) : null,
     el('ul', null, flagged.length ? flagged.map(flaggedItem) : el('li', { class: 'muted' }, 'No flagged claims.')),
+    added.length ? el('p', { class: 'how worked-head' }, 'Citations added, for figures the answer cited to the wrong page:') : null,
+    added.length ? el('ul', { class: 'worked' }, added.map((a) => el('li', null, `${a.figure} → [${a.source}]`))) : null,
     worked.length ? el('p', { class: 'how worked-head' }, 'Worked out from the cited figures:') : null,
     worked.length ? el('ul', { class: 'worked' }, worked.map(workedItem)) : null,
   );

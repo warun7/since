@@ -16,7 +16,7 @@ import { safeTz } from '../memory/temporal.js';
 import { processTurn } from '../memory/writer.js';
 import { DeepSeekSearch, formatResultsForModel, SourceRegistry, webSearch } from '../search/index.js';
 import type { AgentEvent, SearchProvider, SearchQuery, Source, SourceSummary, TurnInput, TurnMemory, TurnTrace } from '../types.js';
-import { groundAnswer } from '../verify/grounding.js';
+import { groundAnswer, repairCitations } from '../verify/grounding.js';
 import { upheldEnabled, verifyAnswer } from '../verify/upheld.js';
 import { citedNumbers, dropUnknownCitations } from './citations.js';
 import { contextMessage, historyMessages } from './context.js';
@@ -198,6 +198,10 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   // ── finish: keep only real citations, persist, notify ──
   const known = new Set(registry.all().map((s) => s.n));
   content = dropUnknownCitations(content, known).trim();
+  // A price cited to the wrong page, when it is on another page the model was shown this turn,
+  // gets that page's citation before anything is saved or shown as final.
+  const repair = repairCitations({ question: input.message, answer: content, sources: citedSources(content), shown: registry.added() });
+  content = repair.answer;
   const { messageId, cited } = persistAnswer(content);
   store.saveSources(conversationId, registry.all());
 
@@ -225,17 +229,22 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   if (cited.length) {
     const check = { question: input.message, answer: content, sources: cited, shown: registry.added() };
     const verification = upheldEnabled() ? await verifyAnswer(check, { signal: input.signal }) : groundAnswer(check);
+    if (repair.added.length) verification.added = repair.added;
     store.setVerification(messageId, verification);
     emit({ type: 'verification', messageId, verification });
   }
 
   return { conversationId, messageId, content, trace, notes };
 
-  function persistAnswer(text: string): { messageId: string; cited: Source[] } {
-    trace.timings.totalMs = elapsed();
-    const cited = citedNumbers(text)
+  function citedSources(text: string): Source[] {
+    return citedNumbers(text)
       .map((n) => registry.get(n))
       .filter((s): s is Source => Boolean(s));
+  }
+
+  function persistAnswer(text: string): { messageId: string; cited: Source[] } {
+    trace.timings.totalMs = elapsed();
+    const cited = citedSources(text);
     const msg = store.addMessage({
       conversationId,
       role: 'assistant',
