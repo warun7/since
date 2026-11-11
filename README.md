@@ -66,6 +66,16 @@ npx cf deploy --secrets-file ../.env   # uploads the keys in .env as Worker secr
 
 Set `CANONICAL_ORIGIN` in `cloud/cloudflare.config.ts` to your own address, or remove it to serve from workers.dev. `npx cf dev` in `cloud/` runs the Worker locally (put the key in `cloud/.dev.vars`).
 
+## What it costs, and what breaks first
+
+A searching answer spends about 0.6¢ on the Search API (a median of eight queries at $0.75 per
+1,000) and 0.07¢ on reasoning. That is why a step caps at 8 queries and a turn at 3 rounds, and
+why the demo's 500 questions a day bound the bill. At a hundred times the traffic the first
+bottleneck is the single Budget Durable Object that meters every question, then the per-isolate
+query cache, then cold starts — none of which touches the agent loop. What we would watch:
+first-token p50, the gap-search rate, grounding flags and search failures, all already recorded
+in each turn's trace.
+
 ## Citation checks
 
 Every cited answer gets a **grounding check**, the hosted demo included. Each figure in a cited claim (a price, a limit, a percentage, a version) is looked for in the passages of the source it cites, and the badge under the answer says how many claims had every figure on the page. It needs no model and takes a few milliseconds. It catches a figure that isn't in the source, such as a stale price or a made-up number. A total worked out from cited figures (15 seats × $10 = $150, a monthly price × 12) counts only if the sum comes out, and the answer's details show the sum. A price cited to the wrong page, when it is on another page the model was shown that shares a name or another figure with the claim, gets that page's citation added before the answer is saved; the details list each one. Any other missing figure that is on a page the model was shown is noted with that page, so a citation to the wrong page reads differently from a number with no source. It can't catch a misreading of a figure that is on the page, such as another plan's price; that needs a model.
