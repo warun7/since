@@ -223,7 +223,7 @@ export async function runTurn(input: TurnInput, emit: (e: AgentEvent) => void, d
   // The grounding check runs on every cited answer; upheld, when configured, replaces it with
   // the deeper model-based check.
   if (cited.length) {
-    const check = { question: input.message, answer: content, sources: cited };
+    const check = { question: input.message, answer: content, sources: cited, shown: registry.added() };
     const verification = upheldEnabled() ? await verifyAnswer(check, { signal: input.signal }) : groundAnswer(check);
     store.setVerification(messageId, verification);
     emit({ type: 'verification', messageId, verification });

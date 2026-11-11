@@ -804,6 +804,12 @@ button.verify-badge { cursor: pointer; }
   color: var(--muted);
 }
 
+.flagged .worked-head { margin: 12px 0 6px; }
+
+.flagged .worked { font-size: 13px; }
+
+.flagged .worked li + li { margin-top: 4px; }
+
 /* Errors */
 
 .turn-error {

@@ -719,7 +719,8 @@ function setVerifyPending(parts) {
 
 const GROUNDING_HOW =
   'Each figure in a cited claim was looked for in the passages of the source it cites. ' +
-  "It runs on every answer, with no model: it catches a figure that isn't on the page, not a misreading of one that is.";
+  'A total worked out from them, such as a seat price times your team size, counts when the sum comes out. ' +
+  "It runs on every answer, with no model: it catches a figure that isn't on the page or doesn't add up, not a misreading of one that is.";
 
 function paintVerification(slot, v) {
   slot.replaceChildren();
@@ -738,12 +739,15 @@ function paintVerification(slot, v) {
     return;
   }
   const flagged = v.flagged ?? [];
+  const worked = grounding ? (v.worked ?? []) : [];
   const good = v.cited > 0 && v.supported === v.cited;
   const panel = el(
     'div',
     { class: 'flagged', hidden: true },
     grounding ? el('p', { class: 'how' }, GROUNDING_HOW) : null,
     el('ul', null, flagged.length ? flagged.map(flaggedItem) : el('li', { class: 'muted' }, 'No flagged claims.')),
+    worked.length ? el('p', { class: 'how worked-head' }, 'Worked out from the cited figures:') : null,
+    worked.length ? el('ul', { class: 'worked' }, worked.map(workedItem)) : null,
   );
   const label = grounding
     ? `Grounding check: ${v.supported}/${v.cited} grounded`
@@ -758,6 +762,11 @@ function paintVerification(slot, v) {
     badge.setAttribute('aria-expanded', String(!panel.hidden));
   });
   slot.append(badge, panel);
+}
+
+function workedItem(w) {
+  const cites = w.source ? ` [${w.source.split(', ').join('][')}]` : '';
+  return el('li', null, `${w.figure} ${w.how}`, el('span', { class: 'muted' }, cites));
 }
 
 function flaggedItem(f) {

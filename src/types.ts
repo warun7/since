@@ -194,6 +194,8 @@ export interface Verification {
   supported: number;
   cited: number;
   flagged: Array<{ claim: string; verdict: string; source?: string; note?: string }>;
+  /** Grounding check: figures not on the page but worked out from it ("$150", "= 15 × $10"). */
+  worked?: Array<{ figure: string; how: string; source?: string }>;
   verifier?: string;
   ms: number;
   error?: string;

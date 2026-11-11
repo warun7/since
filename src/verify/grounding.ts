@@ -3,16 +3,21 @@
 // behind it, so it runs on every answer, the hosted demo included.
 //
 // It is narrower than verification, and named so. It catches a price, a limit or a percentage
-// that isn't in the cited text (made up, misremembered, or carried over from the past). It
-// can't tell that a claim misreads a figure that *is* there: that needs a model, which is what
-// upheld does when UPHELD_URL is set.
+// that isn't in the cited text (made up, misremembered, or carried over from the past), and a
+// total that doesn't add up: a figure worked out from the cited ones (a seat price times the
+// user's team size, a monthly price times 12) is checked by redoing the sum. It can't tell
+// that a claim misreads a figure that *is* there: that needs a model, which is what upheld
+// does when UPHELD_URL is set.
 import { tablesToClaims } from './upheld.js';
 import type { Source, Verification } from '../types.js';
 
 export const GROUNDING = 'grounding';
 
-/** Per-claim verdicts. Only cited claims that carry a figure are counted. */
-export type GroundingVerdict = 'grounded' | 'number not in source' | 'no passage';
+/**
+ * Per-claim verdicts. Only cited claims that carry a figure are counted. "in another source":
+ * every missing figure is on a page the model was shown, just not the one it cited.
+ */
+export type GroundingVerdict = 'grounded' | 'number not in source' | 'in another source' | 'no passage';
 
 export interface Figure {
   /** As written in the answer, e.g. "$0.106" or "20%". */
@@ -23,11 +28,23 @@ export interface Figure {
   unit: string;
 }
 
+export interface WorkedFigure {
+  /** As written in the answer. */
+  text: string;
+  /** The sum that gives it, from the cited figures: "= 15 × $10", "≈ 15 × $8.15 × 12", "≈ $8.15". */
+  how: string;
+}
+
 export interface GroundedClaim {
   text: string;
   cites: number[];
   verdict: GroundingVerdict;
+  /** Figures neither in the cited passages nor worked out from them. */
   missing: Figure[];
+  /** Of the missing, the ones on another page the model was shown, with its numbers. */
+  elsewhere: Array<{ figure: Figure; sources: number[] }>;
+  /** Figures not on the page but worked out from it. */
+  worked: WorkedFigure[];
 }
 
 const CURRENCY: Record<string, string> = { $: '$', '€': '€', '£': '£', '₹': '₹', '¥': '¥', usd: '$', eur: '€', gbp: '£', inr: '₹' };
@@ -43,6 +60,8 @@ const MONTH =
 const FIGURE =
   /(?<![\p{L}\p{N}_.])(US\$|[$€£₹¥]|(?:USD|EUR|GBP|INR)\s?)?\s?(\d{1,3}(?:,\d{3})+|\d+)((?:\.\d+)+)?(?:\s?(k|K|M|B|bn|thousand|million|billion)\b)?(\s?(?:%|percent\b|(?:USD|EUR|GBP|INR)\b))?/gu;
 const MULTIPLIER: Record<string, number> = { k: 1e3, K: 1e3, thousand: 1e3, M: 1e6, million: 1e6, B: 1e9, bn: 1e9, billion: 1e9 };
+const MONEY = new Set(Object.values(CURRENCY));
+const RANGE = /^\s*(?:[–—-]|to)\s*$/;
 
 /** Dates name when, and the date in an answer is often today's, not one the page states. */
 const DATES = [
@@ -77,10 +96,15 @@ export function figures(text: string, opts: { skipContrast?: boolean } = {}): Fi
   let t = text;
   for (const re of DATES) t = blank(t, re);
   const out: Figure[] = [];
+  let prev: { end: number; unit: string } | null = null;
   for (const m of t.matchAll(FIGURE)) {
     const [, before, whole, frac, scale, after] = m;
+    const end = m.index + m[0].length;
+    let unit = unitOf(before, after);
+    // The far end of a range takes the currency of the near one: "$2,900–3,500" is two prices.
+    if (!unit && prev && MONEY.has(prev.unit) && RANGE.test(t.slice(prev.end, m.index))) unit = prev.unit;
+    prev = { end, unit };
     if (opts.skipContrast && CONTRAST.test(t.slice(Math.max(0, m.index - 40), m.index))) continue;
-    const unit = unitOf(before, after);
     const digits = `${whole!.replace(/,/g, '')}${frac ?? ''}`;
     const version = (frac ?? '').split('.').length > 2;
     const key = version ? digits : String(Math.round(Number(digits) * (MULTIPLIER[scale ?? ''] ?? 1) * 1e6) / 1e6);
@@ -158,18 +182,120 @@ function appears(fig: Figure, haystack: Figure[]): boolean {
   });
 }
 
+/** "about $8", "~$150": the answer says the figure is rounded. */
+const APPROX = /(?:~|≈|\b(?:about|around|roughly|approximately|approx\.?|nearly|almost|circa))\s*$/i;
+/** A team size: "15 users", "a 20-person team", "for 15 seats", "a team of 12". */
+const HEADCOUNT =
+  /\b(\d{1,3}(?:,\d{3})+|\d+)(?:\s+|-)(?:users?|seats?|people|persons?|members?|employees?|engineers?|developers?|devs?|agents?|licen[cs]es?)\b|\bteam of (\d+)\b/gi;
+/** Price pairs tried as differences ("$90 more" = 15 × ($16 − $10)); more prices than this aren't paired. */
+const MAX_PRICES = 40;
+/** What the figure is per, from the words after it ("$1,800 a year", "$150/mo", "$10 per user"). */
+const PER_YEAR = /^\s*(?:\/\s*(?:yr|year|annum)\b|(?:a|per|each|every)\s+year\b|annually\b|yearly\b|per\s+annum\b)/i;
+const PER_MONTH = /^\s*(?:\/\s*(?:mo|month)\b|(?:a|per|each|every)\s+month\b|monthly\b)/i;
+const PER_SEAT = /^\s*(?:\/\s*|(?:a|per|each)\s+)(?:users?|seats?|members?|agents?|persons?|heads?|editors?|licen[cs]es?)\b/i;
+/** The rest of a range after its near end: "–$1,750/year" says what "$1,470" is per. */
+const RANGE_REST = /^\s*(?:[–—-]|to)\s*(?:US\$|[$€£₹¥])?\s?\d[\d,]*(?:\.\d+)?(?:\s?(?:k|K|M|B|bn))?/;
+
+interface FigureContext {
+  /** The answer says it's rounded: "about $8". */
+  approx: boolean;
+  year: boolean;
+  month: boolean;
+  /** A per-seat price is never a team total. */
+  seat: boolean;
+}
+
+function contextOf(text: string, fig: Figure): FigureContext | null {
+  const at = text.indexOf(fig.text);
+  if (at < 0) return null;
+  const after = text.slice(at + fig.text.length).replace(RANGE_REST, '');
+  return {
+    approx: APPROX.test(text.slice(Math.max(0, at - 12), at)),
+    year: PER_YEAR.test(after),
+    month: PER_MONTH.test(after),
+    seat: PER_SEAT.test(after),
+  };
+}
+
+/**
+ * How far a worked-out value may be from the figure: the figure's own rounding ("$1,800" is to
+ * the nearest 100, "$122" to the dollar, "$145.50" to the cent), and never more than 1%, or 3%
+ * when the answer says "about".
+ */
+function tolerance(fig: Figure, approx: boolean): number {
+  const value = Number(fig.key);
+  const m = fig.text.match(/(\d[\d,]*)((?:\.\d+)?)\s?(k|K|M|B|bn|thousand|million|billion)?/);
+  if (!m) return 0;
+  const [, whole = '', frac = '', scale] = m;
+  const place = frac ? -(frac.length - 1) : whole.replace(/,/g, '').match(/0*$/)![0].length;
+  const half = 0.5 * 10 ** place * (MULTIPLIER[scale ?? ''] ?? 1);
+  return Math.min(half, value * (approx ? 0.03 : 0.01));
+}
+
+/**
+ * The sum that gives a price from the cited prices: a price times the team size (or the gap
+ * between two prices times it, "an extra $90/mo"), and times 12 only for a figure the answer
+ * gives per year (÷ 12 per month). Simplest first. A figure merely rounded from the page only
+ * counts when the answer says it is ("about $8" for $8.15). Each of these limits keeps a wrong
+ * figure from passing as some other sum of the numbers on the page.
+ */
+function workOut(fig: Figure, ctx: FigureContext, pool: Figure[], counts: number[]): string | null {
+  const value = Number(fig.key);
+  if (!MONEY.has(fig.unit) || !(value > 0)) return null;
+  const tol = tolerance(fig, ctx.approx);
+  const prices = [...new Map(pool.filter((f) => f.unit === fig.unit && Number(f.key) > 0).map((f) => [Number(f.key), f.text])).entries()]
+    .slice(0, MAX_PRICES)
+    .map(([v, text]) => ({ v, label: text }));
+  const gaps = prices.flatMap((a) => prices.filter((b) => b.v < a.v).map((b) => ({ v: a.v - b.v, label: `(${a.label} − ${b.label})` })));
+  const heads = ctx.seat ? [] : [...new Set(counts)];
+  const yearly: [number, string] = [12, ' × 12'];
+  const monthly: [number, string] = [1 / 12, ' ÷ 12'];
+  // A yearly figure is tried as a monthly price times 12 before anything else.
+  const steps: Array<{ bases: typeof prices; heads: number[]; period: [number, string] }> = [
+    ...(ctx.year ? [{ bases: prices, heads, period: yearly }, { bases: prices, heads: [1], period: yearly }] : []),
+    { bases: prices, heads, period: [1, ''] },
+    ...(ctx.month ? [{ bases: prices, heads, period: monthly }, { bases: prices, heads: [1], period: monthly }] : []),
+    { bases: gaps, heads, period: [1, ''] },
+    ...(ctx.year ? [{ bases: gaps, heads, period: yearly }] : []),
+  ];
+  const close = (v: number) => Math.abs(v - value) <= tol + 1e-9;
+  const sign = (v: number) => (Math.abs(v - value) < 0.005 ? '=' : '≈');
+  if (ctx.approx) {
+    const near = prices.find((p) => close(p.v));
+    if (near) return `≈ ${near.label}`;
+  }
+  for (const { bases, heads: hs, period } of steps) {
+    for (const base of bases) {
+      for (const h of hs) {
+        const v = base.v * h * period[0];
+        if (close(v)) return `${sign(v)} ${h > 1 ? `${h} × ` : ''}${base.label}${period[1]}`;
+      }
+    }
+  }
+  return null;
+}
+
+/** Team sizes a total may be worked out with: headcounts in the question and in the claim. */
+function headcounts(question: string, claim: string): number[] {
+  return [...`${question}\n${claim}`.matchAll(HEADCOUNT)]
+    .map((m) => Number((m[1] ?? m[2])!.replace(/,/g, '')))
+    .filter((n) => Number.isInteger(n) && n >= 2 && n <= 100_000);
+}
+
 export interface GroundingInput {
   answer: string;
   sources: Source[];
   /** The user's question: a bare count it gives ("a 20-person team") is their premise, not the source's. */
   question?: string;
+  /** Every source the model was shown: a figure missing from the cited ones is looked for here. */
+  shown?: Source[];
 }
 
 export function checkGrounding(input: GroundingInput): { claims: GroundedClaim[]; ms: number } {
   const started = performance.now();
   const premise = figures(input.question ?? '').filter((f) => f.unit === '');
   const bySource = new Map<number, Figure[] | null>();
-  for (const s of input.sources) {
+  for (const s of [...(input.shown ?? []), ...input.sources]) {
     const text = s.passages.join('\n');
     bySource.set(s.n, text.trim() ? figures(`${s.title}\n${text}`) : null);
   }
@@ -183,21 +309,40 @@ export function checkGrounding(input: GroundingInput): { claims: GroundedClaim[]
 
     const cites = [...new Set(parts.flatMap((p) => p.cites))];
     const missing: Figure[] = [];
+    const elsewhere: GroundedClaim['elsewhere'] = [];
+    const worked: WorkedFigure[] = [];
     let checkable = false;
     for (const part of parts) {
       const evidence = part.cites.map((n) => bySource.get(n)).filter((f): f is Figure[] => Array.isArray(f));
       if (!evidence.length) continue;
       checkable = true;
       const pool = evidence.flat();
-      for (const fig of part.figures) if (!appears(fig, pool)) missing.push(fig);
+      const counts = headcounts(input.question ?? '', sentence);
+      for (const fig of part.figures) {
+        if (appears(fig, pool)) continue;
+        const ctx = contextOf(part.text, fig);
+        const how = ctx && workOut(fig, ctx, pool, counts);
+        if (how) {
+          worked.push({ text: fig.text, how });
+          continue;
+        }
+        missing.push(fig);
+        const found = [...bySource]
+          .filter(([n, figs]) => !part.cites.includes(n) && figs && appears(fig, figs))
+          .map(([n]) => n)
+          .sort((a, b) => a - b);
+        if (found.length) elsewhere.push({ figure: fig, sources: found });
+      }
     }
     const text = sentence.replace(MARKER_RUN, (m) => ` ${m.trim()}`).replace(/\s+/g, ' ').trim();
-    claims.push({
-      text,
-      cites,
-      verdict: !checkable ? 'no passage' : missing.length ? 'number not in source' : 'grounded',
-      missing,
-    });
+    const verdict: GroundingVerdict = !checkable
+      ? 'no passage'
+      : !missing.length
+        ? 'grounded'
+        : elsewhere.length === missing.length
+          ? 'in another source'
+          : 'number not in source';
+    claims.push({ text, cites, verdict, missing, elsewhere, worked });
   }
   return { claims, ms: Math.round(performance.now() - started) };
 }
@@ -215,9 +360,21 @@ export function groundAnswer(input: GroundingInput): Verification {
         claim: c.text,
         verdict: c.verdict,
         source: c.cites.length ? c.cites.map(String).join(', ') : undefined,
-        note: c.missing.length ? `Not in the cited text: ${[...new Set(c.missing.map((f) => f.text))].join(', ')}` : undefined,
+        note: c.missing.length ? `Not in the cited text: ${missingList(c)}` : undefined,
       })),
+    worked: claims.flatMap((c) => c.worked.map((w) => ({ figure: w.text, how: w.how, source: c.cites.join(', ') || undefined }))),
     verifier: GROUNDING,
     ms,
   };
+}
+
+/** "$7, $9.70 (in [17])": each missing figure once, with the page it is on when it is on one. */
+function missingList(claim: GroundedClaim): string {
+  const seen = new Map<string, string>();
+  for (const f of claim.missing) {
+    if (seen.has(f.text)) continue;
+    const where = claim.elsewhere.find((e) => e.figure === f)?.sources;
+    seen.set(f.text, where ? `${f.text} (in ${where.map((n) => `[${n}]`).join('')})` : f.text);
+  }
+  return [...seen.values()].join(', ');
 }
